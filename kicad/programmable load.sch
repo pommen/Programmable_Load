@@ -1,0 +1,205 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L BUZ11 Q?
+U 1 1 59A1969C
+P 5950 3600
+F 0 "Q?" H 6200 3675 50  0000 L CNN
+F 1 "BUZ11" H 6200 3600 50  0000 L CNN
+F 2 "TO-220" H 6200 3525 50  0000 L CIN
+F 3 "" H 5950 3600 50  0000 L CNN
+	1    5950 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L BUZ11 Q?
+U 1 1 59A196D7
+P 7350 3350
+F 0 "Q?" H 7600 3425 50  0000 L CNN
+F 1 "BUZ11" H 7600 3350 50  0000 L CNN
+F 2 "TO-220" H 7600 3275 50  0000 L CIN
+F 3 "" H 7350 3350 50  0000 L CNN
+	1    7350 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L OP275 U?
+U 1 1 59A196F0
+P 4100 3450
+F 0 "U?" H 4100 3600 50  0000 L CNN
+F 1 "OP275" H 4100 3300 50  0000 L CNN
+F 2 "" H 4000 3500 50  0000 C CNN
+F 3 "" H 4100 3600 50  0000 C CNN
+	1    4100 3450
+	1    0    0    1   
+$EndComp
+$Comp
+L OP275 U?
+U 1 1 59A1972B
+P 8850 3450
+F 0 "U?" H 8850 3600 50  0000 L CNN
+F 1 "OP275" H 8850 3300 50  0000 L CNN
+F 2 "" H 8750 3500 50  0000 C CNN
+F 3 "" H 8850 3600 50  0000 C CNN
+	1    8850 3450
+	-1   0    0    1   
+$EndComp
+$Comp
+L BC547 Q?
+U 1 1 59A199BC
+P 5150 3450
+F 0 "Q?" H 5350 3525 50  0000 L CNN
+F 1 "BC547" H 5350 3450 50  0000 L CNN
+F 2 "TO-92" H 5350 3375 50  0000 L CIN
+F 3 "" H 5150 3450 50  0000 L CNN
+	1    5150 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L BC547 Q?
+U 1 1 59A19A31
+P 7950 3950
+F 0 "Q?" H 8150 4025 50  0000 L CNN
+F 1 "BC547" H 8150 3950 50  0000 L CNN
+F 2 "TO-92" H 8150 3875 50  0000 L CIN
+F 3 "" H 7950 3950 50  0000 L CNN
+	1    7950 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C?
+U 1 1 59A19A9C
+P 4450 3800
+F 0 "C?" H 4475 3900 50  0000 L CNN
+F 1 "C" H 4475 3700 50  0000 L CNN
+F 2 "" H 4488 3650 50  0000 C CNN
+F 3 "" H 4450 3800 50  0000 C CNN
+	1    4450 3800
+	-1   0    0    1   
+$EndComp
+$Comp
+L C C?
+U 1 1 59A19AE1
+P 8350 4300
+F 0 "C?" H 8375 4400 50  0000 L CNN
+F 1 "C" H 8375 4200 50  0000 L CNN
+F 2 "" H 8388 4150 50  0000 C CNN
+F 3 "" H 8350 4300 50  0000 C CNN
+	1    8350 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R?
+U 1 1 59A19B06
+P 4650 3450
+F 0 "R?" V 4730 3450 50  0000 C CNN
+F 1 "R" V 4650 3450 50  0000 C CNN
+F 2 "" V 4580 3450 50  0000 C CNN
+F 3 "" H 4650 3450 50  0000 C CNN
+	1    4650 3450
+	0    1    1    0   
+$EndComp
+$Comp
+L R R?
+U 1 1 59A19B5D
+P 7550 4300
+F 0 "R?" V 7630 4300 50  0000 C CNN
+F 1 "R" V 7550 4300 50  0000 C CNN
+F 2 "" V 7480 4300 50  0000 C CNN
+F 3 "" H 7550 4300 50  0000 C CNN
+	1    7550 4300
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R?
+U 1 1 59A19CF4
+P 4000 4050
+F 0 "R?" V 4080 4050 50  0000 C CNN
+F 1 "R" V 4000 4050 50  0000 C CNN
+F 2 "" V 3930 4050 50  0000 C CNN
+F 3 "" H 4000 4050 50  0000 C CNN
+	1    4000 4050
+	0    1    1    0   
+$EndComp
+$Comp
+L R R?
+U 1 1 59A19DE9
+P 5250 4000
+F 0 "R?" V 5330 4000 50  0000 C CNN
+F 1 "R" V 5250 4000 50  0000 C CNN
+F 2 "" V 5180 4000 50  0000 C CNN
+F 3 "" H 5250 4000 50  0000 C CNN
+	1    5250 4000
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	4400 3450 4500 3450
+Wire Wire Line
+	4800 3450 4950 3450
+Wire Wire Line
+	5250 3650 5250 3850
+Wire Wire Line
+	3800 3550 3800 4300
+Wire Wire Line
+	3800 4050 3850 4050
+Wire Wire Line
+	4150 4050 4450 4050
+Wire Wire Line
+	4450 4050 4450 3950
+Wire Wire Line
+	4450 3650 4450 3450
+Connection ~ 4450 3450
+Wire Wire Line
+	3800 4300 6050 4300
+Connection ~ 5250 3800
+Connection ~ 3800 4050
+Wire Wire Line
+	6050 4300 6050 3800
+Wire Wire Line
+	5250 3700 5750 3700
+Wire Wire Line
+	5750 3700 5750 3650
+Connection ~ 5250 3700
+$EndSCHEMATC
