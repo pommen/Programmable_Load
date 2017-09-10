@@ -96,7 +96,6 @@ uint8_t graph6[8] = { 0b11100, 0b10100, 0b11100, 0b00000, 0b00000, 0b00000, 0b00
 
 void setup(){
 
-								usb.begin(9600);
 
 								initEncoders();
 								pinMode(fanOut, PWM);
@@ -160,10 +159,6 @@ void loop(){
 								for (byte counter = 0; counter < MAXENCODERS; counter++) {
 																if ((lastEncoderPos[counter] != encoderpos[counter])) {
 
-																								usb.print("Encoder #");
-																								usb.print(counter);
-																								usb.print(" Value ");
-																								usb.println(encoderpos[counter]);
 																								encflag[counter] = LOW;
 																								lastEncoderPos[counter] = encoderpos[counter];
 
