@@ -37,7 +37,6 @@ Adafruit_INA219 ina219;
 LiquidCrystal_I2C lcd(0x3f,20,4);
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 Adafruit_MCP4725 dac;
-USBSerial usb;
 
 
 
