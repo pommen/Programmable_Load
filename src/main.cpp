@@ -147,8 +147,8 @@ void setup(){
 								for (byte counter = 0; counter < MAXENCODERS; counter++) {
 																encoderpos[counter] =0;
 								}
-								analogWrite(fanOut, 125);
-								//pwmWrite(fanOut, 65535/2); //65535 max
+								analogWrite(fanOut, 100);
+								//pwmWrite(fanOut, 25535); //65535 max
 
 
 }
@@ -191,7 +191,7 @@ void loop(){
 																lcd.write(6);
 																temptime=millis();
 																if (blockTemp > 19) {
-																								pwmWrite(fanOut, 32000); //65535 max
+																								digitalWrite(fanOut, HIGH);
 																}
 								}
 }
@@ -209,6 +209,7 @@ void setDAC(){
 }
 
 void status(){
+
 								lcd.setCursor(0, 0);
 								lcd.print("V:");
 								lcd.print(ina219.getBusVoltage_V());
@@ -250,6 +251,8 @@ void updateDisp(){
 								lcd.print("     ");
 								lcd.setCursor(14, 3);
 								lcd.print(Vin / 561.5714, 1);
+								status();
+								pwmWrite(fanOut, encoderpos[1]*10);
 
 }
 
