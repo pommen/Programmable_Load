@@ -68,7 +68,7 @@ int vintemp =0;
 int fanOut = PA9;
 int encBTN = PA2;
 int blockTempPin = PB0;
-
+int loadEnabledPin = PB1;
 
 //encoder stuff:
 #define MAXENCODERS 2
@@ -101,8 +101,9 @@ void setup(){
 								pinMode(fanOut, PWM);
 								pinMode(encBTN, INPUT_PULLUP);
 								pinMode(blockTempPin, INPUT_ANALOG);
+								pinMode(loadEnabledPin, OUTPUT);
 								attachInterrupt(encBTN, click, FALLING);
-								lcd.init();                  // initialize the lcd // For Adafruit MCP4725A1 the address is 0x62 (default) or 0x63 (ADDR pin tied to VCC)
+								lcd.init();  // initialize the lcd
 
 								// Initialize the INA219.
 								// By default the initialization will use the largest range (32V, 2A).  However
@@ -148,6 +149,7 @@ void setup(){
 																encoderpos[counter] =0;
 								}
 								analogWrite(fanOut, 100);
+								digitalWrite(loadEnabledPin, LOW);
 								//pwmWrite(fanOut, 25535); //65535 max
 
 
@@ -205,7 +207,8 @@ void click(){
 
 void setDAC(){
 								dac.setVoltage(encoderpos[0], false);
-
+								if (encoderpos[0] >= 100) digitalWrite(loadEnabledPin, HIGH);
+								else digitalWrite(loadEnabledPin, LOW);
 }
 
 void status(){
@@ -287,7 +290,8 @@ void bargraph(int length, int row, int full){
 																for (int i = 0; i < fullablock; i++) {
 																								lcd.write(5);
 																}
-																if (fullablock<lastEncVal && fullablock>0) lcd.print(" "); //om vi går bakår så suddar vi ut det som var framför
+																if (fullablock<lastEncVal && fullablock>0) lcd.print(" ");
+																//om vi går bakår så suddar vi ut det som var framför
 																lcd.setCursor(fullablock, row);
 								}
 
