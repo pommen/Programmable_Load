@@ -3,6 +3,7 @@
 
    ==============  Variable load  ================
 
+Currently running bon blupill
 
     --------------------
    DAC = 4096 steps (12 bit)
@@ -72,10 +73,7 @@ int fanOut = PA9;
 int encBTN = PA2;
 int blockTempPin = PB0;
 int loadEnabledPin = PB1;
-<<<<<<< HEAD
 
-=======
->>>>>>> 707df570605d701937b0c70e7cfab23fd6e0998a
 
 
 
