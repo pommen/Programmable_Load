@@ -3,7 +3,7 @@
 
    ==============  Variable load  ================
 
-Currently running bon blupill
+Currently running on bluepill
 
     --------------------
    DAC = 4096 steps (12 bit)
