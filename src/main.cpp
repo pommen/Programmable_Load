@@ -3,7 +3,7 @@
 
    ==============  Variable load  ================
 
-Currently running on bluepill
+   Currently running on bluepill
 
     --------------------
    DAC = 4096 steps (12 bit)
@@ -22,7 +22,7 @@ Currently running on bluepill
    ADC inouts:
               A0:Current set gain (trim to 1.1v @ max steps)
               A1:zerocurrent (Trim to 0v at min steps)
-              A2:input voltage
+              A2:input volta ge
               A3:Voltagedrop over shunt
 
  */
