@@ -1,0 +1,26 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#
+# SN74LVC1G14-RESCUE-ControllerStage
+#
+DEF SN74LVC1G14-RESCUE-ControllerStage U 0 40 Y Y 1 F N
+F0 "U" 150 250 60 H V C CNN
+F1 "SN74LVC1G14-RESCUE-ControllerStage" 450 -300 60 H V C CNN
+F2 "TO_SOT_Packages_SMD:SOT-23-5_HandSoldering" 0 750 60 H I C CNN
+F3 "http://www.ti.com/lit/ds/symlink/sn74lvc1g14.pdf" 0 600 60 H I C CNN
+DRAW
+C 200 0 50 0 1 0 N
+P 2 0 1 0 -100 -50 50 -50 N
+P 2 0 1 0 -100 100 50 100 N
+P 2 0 1 0 -50 100 -50 -50 N
+P 2 0 1 0 0 100 0 -50 N
+P 5 0 1 0 200 0 -150 300 -150 0 -150 -300 200 0 f
+X A 2 -350 0 200 R 50 50 1 1 I
+X GND 3 0 -450 200 U 50 50 1 1 I
+X Y 4 400 0 200 L 50 50 1 1 I
+X VCC 5 0 450 200 D 50 50 1 1 I
+X 1 nc -900 350 200 R 50 50 1 1 I N
+ENDDRAW
+ENDDEF
+#
+#End Library
