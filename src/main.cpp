@@ -14,10 +14,10 @@
    I2C addresses:
 
    LCD:0x3F (63)
-   DAC:0x62 (98)
+   DAC:0x60
    ADC:0x48 (72)
-   POT1:0x2C (44) - max gain set
-   POT2:0x2f (47) - set 0 current
+   INA219: 0x4A
+   temp sensor:0x68
 
    ADC inouts:
               A0:Current set gain (trim to 1.1v @ max steps)
@@ -34,10 +34,9 @@
 #include <Adafruit_ADS1015.h>
 #include <Adafruit_INA219.h>
 
-#include <encoder.h>
 
 
-Adafruit_INA219 ina219;
+Adafruit_INA219 ina219(0x4A);
 LiquidCrystal_I2C lcd(0x3f,20,4);
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 Adafruit_MCP4725 dac;
@@ -45,7 +44,6 @@ Adafruit_MCP4725 dac;
 
 
 //functions:
-void initEncoders();
 void updateDisp();
 void bargraph(int length, int row, int full);
 void setDAC();
@@ -67,16 +65,21 @@ int currentDraw =0;
 int Vin =0;
 int lcdUpdateTime = 500;
 int vintemp =0;
+volatile int rot_enc =0;
 
 //pins:
 int fanOut = PA9;
 int encBTN = PA2;
 int blockTempPin = PB0;
 int loadEnabledPin = PB1;
+int rot_EncA = PB3;
+int rot_EncB = PB4;
+int rot_EncBTN = PB5;
 
-
-
-
+//custom files:
+#include <enc.h>
+#include <LCDBargraph.h>
+#include <I2CscannerLCD.h>
 //custom chars:
 uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
 uint8_t graph1[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
@@ -87,16 +90,19 @@ uint8_t graph5[] = {0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
 uint8_t graph6[8] = { 0b11100, 0b10100, 0b11100, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000};
 
 void setup(){
+								Wire.begin();
+								Wire.setClock(400000);
 
-
-								initEncoders();
 								pinMode(fanOut, PWM);
 								pinMode(encBTN, INPUT_PULLUP);
 								pinMode(blockTempPin, INPUT_ANALOG);
 								pinMode(loadEnabledPin, OUTPUT);
 								attachInterrupt(encBTN, click, FALLING);
 								lcd.init();  // initialize the lcd
-
+								lcd.backlight();
+								lcd.print("Programmable Load");
+								lcd.clear();
+								lcd.setCursor(0, 0 );
 								// Initialize the INA219.
 								// By default the initialization will use the largest range (32V, 2A).  However
 								// you can call a setCalibration function to change this range (see comments).
@@ -112,13 +118,10 @@ void setup(){
 								// For Adafruit MCP4725A1 the address is 0x62 (default) or 0x63 (ADDR pin tied to VCC)
 								// For MCP4725A0 the address is 0x60 or 0x61
 								// For MCP4725A2 the address is 0x64 or 0x65
-								dac.begin(0x62);
-								//  dac.setVoltage(0, true); Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
+								dac.begin(0x60);
+								dac.setVoltage(0, false);  //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 
-								lcd.backlight();
-								lcd.clear();
-								lcd.setCursor(0, 0 );
-								lcd.print("Programmable Load");
+
 								lcd.createChar(0, heart);
 								lcd.createChar(1, graph1);
 								lcd.createChar(2, graph2);
@@ -128,21 +131,15 @@ void setup(){
 								lcd.createChar(6, graph6);
 
 								lcd.print(1);
-
 								delay(500);
-								lcd.clear();
 								ads.begin();
-								ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+								//ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
 
 								//40V = 0.76V, 3.8A=0.47V
 
-								// ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
-								for (byte counter = 0; counter < MAXENCODERS; counter++) {
-																encoderpos[counter] =0;
-								}
-								analogWrite(fanOut, 100);
-								digitalWrite(loadEnabledPin, LOW);
-								//pwmWrite(fanOut, 25535); //65535 max
+								ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+								//i2cScanner();
+								attachInterrupt(rot_EncA, Rot_enc_ISR, FALLING); //rotary encoder
 
 
 }
@@ -150,30 +147,10 @@ void setup(){
 void loop(){
 								if (millis() - lcdUpdateTime >= 1000) updateDisp();
 
-								for (byte counter = 0; counter < MAXENCODERS; counter++) {
-																if ((lastEncoderPos[counter] != encoderpos[counter])) {
+								setDAC();
+								updateDisp();
+								//clickHeldTime = millis();
 
-																								encflag[counter] = LOW;
-																								lastEncoderPos[counter] = encoderpos[counter];
-
-																								setDAC();
-																								updateDisp();
-
-																}
-								}
-
-//clickHeldTime = millis();
-
-								if (BTN == true) {
-																for (byte counter = 0; counter < MAXENCODERS; counter++) {
-																								encoderpos[counter] =0;
-																								lcd.setCursor(0, 1);
-																								lcd.print("                    ");
-																								lcd.setCursor(0, 2);
-																								lcd.print("                    ");
-																}
-																BTN = false;
-								}
 //writes the coolingblock temperatur every sec
 								if (millis() - temptime >= 1000) {
 																lcd.setCursor(17,0);
@@ -198,9 +175,10 @@ void click(){
 
 
 void setDAC(){
-								dac.setVoltage(encoderpos[0], false);
-								if (encoderpos[0] >= 100) digitalWrite(loadEnabledPin, HIGH);
-								else digitalWrite(loadEnabledPin, LOW);
+								if (rot_enc >0) {
+
+																dac.setVoltage(rot_enc, false);
+								}
 }
 
 void status(){
@@ -227,11 +205,9 @@ void getADC(){
 void updateDisp(){
 								getADC();
 								lcd.setCursor(0, 1);
-								lcd.print("Enc0: ");
-								lcd.print(encoderpos[0]);
-								lcd.print("  Enc1: ");
-								lcd.print(encoderpos[1]);
-								bargraph(encoderpos[0]*10, 2,410);
+								lcd.print("Enc: ");
+								lcd.print(rot_enc);
+								bargraph(rot_enc*10, 2,410);
 
 								lcd.setCursor(0, 3);
 								lcd.print("I: ");
@@ -247,65 +223,9 @@ void updateDisp(){
 								lcd.setCursor(14, 3);
 								lcd.print(Vin / 561.5714, 1);
 								status();
-								pwmWrite(fanOut, encoderpos[1]*10);
 
 }
 
-void bargraph(int length, int row, int full){
-								if (length == 0 ) {
-																lcd.setCursor(0, row);
-																lcd.print(" ");
-																return;
-								}
-								lastEncVal=length;
-								int fullablock =0;
-								int delAvBlock=0;
-								int temp=0;
-
-								lcd.setCursor(0, row); // set cursor to commanded row
-								//  lcd.print("                    ");
-								length = length/full; //scale dac resolution to length of row
-
-								fullablock = length/5; //figure out how many filled we need
-
-								delAvBlock=fullablock*5;  //how many partly filled do we need?
-								temp=fullablock*5;
-								delAvBlock=length-temp;
-
-
-								if (fullablock > 19) {
-																fullablock = 19;
-																delAvBlock=4;
-								}
-
-								if (fullablock >0) {    //printa fulla block om det behövs
-																for (int i = 0; i < fullablock; i++) {
-																								lcd.write(5);
-																}
-																if (fullablock<lastEncVal && fullablock>0) lcd.print(" ");
-																//om vi går bakår så suddar vi ut det som var framför
-																lcd.setCursor(fullablock, row);
-								}
-
-
-								if (delAvBlock>0) lcd.write(delAvBlock); //printa pixel om det behövs
-
-								if (fullablock<lastEncVal && fullablock>0) { //sudda ut den gamla om vi går nedåt
-																lcd.setCursor(fullablock+1, row);
-																int clear =19-fullablock;
-																for (size_t i = 0; i < clear; i++) {
-																								lcd.print(" ");
-																}
-								}
-
-								if (fullablock<lastEncVal && fullablock==0) { //sudda ut den näst sista om vi äar på 0 fulla
-																lcd.setCursor(1, row);
-																lcd.print(" ");
-								}
-
-								lastEncVal=fullablock;
-
-}
 
 
 

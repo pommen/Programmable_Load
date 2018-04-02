@@ -1,4 +1,4 @@
-update=Sun 03 Sep 2017 02:39:38 PM CEST
+update=Sat 07 Apr 2018 06:57:25 PM CEST
 version=1
 last_client=kicad
 [pcbnew]
@@ -37,9 +37,9 @@ SpiceUseNetNumbers=0
 LabSize=60
 [eeschema]
 version=1
-LibDir=
+LibDir=../Libs/Libs
 [eeschema/libraries]
-LibName1=MosfetStage-rescue
+LibName1=ControllerStage-rescue
 LibName2=power
 LibName3=device
 LibName4=transistors
@@ -69,4 +69,6 @@ LibName27=opto
 LibName28=atmel
 LibName29=contrib
 LibName30=valves
-LibName31=C:/Users/Lillahunden/Documents/kiCAD/Libs/Libs/Peters
+LibName31=Peters
+LibName32=bluepill_breakouts
+LibName33=lib/SN74LVC1G14DBVT

@@ -1,15 +1,15 @@
 EESchema-LIBRARY Version 2.3
 #encoding utf-8
 #
-# LM321-RESCUE-MosfetStage
+# LM321-RESCUE-ControllerStage
 #
-DEF LM321-RESCUE-MosfetStage U 0 20 Y Y 1 F N
+DEF LM321-RESCUE-ControllerStage U 0 20 Y Y 1 F N
 F0 "U" 0 300 50 H V L CNN
-F1 "LM321-RESCUE-MosfetStage" 0 200 50 H V L CNN
-F2 "TO_SOT_Packages_SMD:SOT-23-5" 0 -150 50 H I L CNN
+F1 "LM321-RESCUE-ControllerStage" 0 200 50 H V L CNN
+F2 "TO_SOT_Packages_SMD:SOT-23-5" 0 0 50 H I C CNN
 F3 "" 0 0 50 H I C CNN
 $FPLIST
- SOT?23*
+ SOT*23*
 $ENDFPLIST
 DRAW
 P 4 0 1 10 -200 200 200 0 -200 -200 -200 200 f
