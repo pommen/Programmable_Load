@@ -100,9 +100,9 @@ uint8_t graph6[8] = { 0b11100, 0b10100, 0b11100, 0b00000, 0b00000, 0b00000, 0b00
 void setup(){
 								Wire.begin();
 								Wire.setClock(400000);
-								pinMode(rot_EncA, INPUT_PULLUP);
-								pinMode(rot_EncB, INPUT_PULLUP);
-								pinMode(rot_EncBTN, INPUT_PULLUP);
+								pinMode(rot_EncA, INPUT);
+								pinMode(rot_EncB, INPUT);
+								pinMode(rot_EncBTN, INPUT);
 								pinMode(loadEnabledPin, OUTPUT);
 								pinMode(fanOut, PWM);
 								pinMode(blockTempPin, INPUT_ANALOG);
@@ -168,8 +168,9 @@ void loop(){
 
 																setDAC();
 								}
-								if (rot_EncBTN == HIGH) {
+								if (digitalRead(rot_EncBTN) == HIGH) {
 																dacset = 0;
+																rot_enc=0;
 																setDAC();
 								}
 								//clickHeldTime = millis();
@@ -194,7 +195,7 @@ void loop(){
 
 
 void setDAC(){
-								if (rot_enc >0) dac.setVoltage(dacset, false);
+								dac.setVoltage(dacset, false);
 
 }
 
