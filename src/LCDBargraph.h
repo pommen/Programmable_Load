@@ -1,5 +1,5 @@
 void bargraph(int length, int row, int full){
-        if (length == 0 ) {
+        if (length == 0 ) { //Suddar ut om värdet är noll
                 lcd.setCursor(0, row);
                 lcd.print(" ");
                 return;

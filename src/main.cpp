@@ -47,7 +47,6 @@ Adafruit_MCP4725 dac;
 void updateDisp();
 void bargraph(int length, int row, int full);
 void setDAC();
-void click();
 void debounce();
 void getADC();
 void status();
@@ -55,7 +54,6 @@ void status();
 
 //Vars:
 int lastEncVal =0;
-boolean BTN = false;
 int deboundeTime = 0;
 bool clickHeld = false;
 int clickHeldTime =0;
@@ -65,17 +63,21 @@ int currentDraw =0;
 int Vin =0;
 int lcdUpdateTime = 500;
 int vintemp =0;
+int rot_EncA_Value =0;
 volatile int rot_enc =0;
 
 //pins:
-int fanOut = PA9;
-int encBTN = PA2;
-int blockTempPin = PB0;
-int loadEnabledPin = PB1;
-int rot_EncA = PB3;
-int rot_EncB = PB4;
-int rot_EncBTN = PB5;
-
+const int fanOut = PA7;
+const int out2 = PB1;
+const int blockTempPin = PB0;
+const int loadEnabledPin = PA12;
+const int rot_EncA = PA15;
+const int rot_EncB = PB4;
+const int rot_EncBTN = PB5;
+const int compratorPin = PA11;
+const int trig = PA4;
+const int fetTemp = PA0;
+const int tempAlarm = PA8;
 //custom files:
 #include <enc.h>
 #include <LCDBargraph.h>
@@ -92,12 +94,13 @@ uint8_t graph6[8] = { 0b11100, 0b10100, 0b11100, 0b00000, 0b00000, 0b00000, 0b00
 void setup(){
 								Wire.begin();
 								Wire.setClock(400000);
-
+								pinMode(rot_EncA, INPUT_PULLUP);
+								pinMode(rot_EncB, INPUT_PULLUP);
+								pinMode(rot_EncBTN, INPUT_PULLUP);
+								pinMode(loadEnabledPin, OUTPUT);
 								pinMode(fanOut, PWM);
-								pinMode(encBTN, INPUT_PULLUP);
 								pinMode(blockTempPin, INPUT_ANALOG);
 								pinMode(loadEnabledPin, OUTPUT);
-								attachInterrupt(encBTN, click, FALLING);
 								lcd.init();  // initialize the lcd
 								lcd.backlight();
 								lcd.print("Programmable Load");
@@ -130,8 +133,7 @@ void setup(){
 								lcd.createChar(5, graph5);
 								lcd.createChar(6, graph6);
 
-								lcd.print(1);
-								delay(500);
+
 								ads.begin();
 								//ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
 
@@ -139,16 +141,17 @@ void setup(){
 
 								ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
 								//i2cScanner();
-								attachInterrupt(rot_EncA, Rot_enc_ISR, FALLING); //rotary encoder
-
+								attachInterrupt(rot_EncB, Rot_enc_ISR, FALLING);
+								digitalWrite(loadEnabledPin, LOW);
 
 }
 
 void loop(){
+
+
 								if (millis() - lcdUpdateTime >= 1000) updateDisp();
 
 								setDAC();
-								updateDisp();
 								//clickHeldTime = millis();
 
 //writes the coolingblock temperatur every sec
@@ -169,15 +172,11 @@ void loop(){
 
 
 
-void click(){
-								BTN = true;
-}
-
 
 void setDAC(){
-								if (rot_enc >0) {
-
-																dac.setVoltage(rot_enc, false);
+								if (rot_enc >0) dac.setVoltage(rot_enc*10, false);
+								if (rot_enc <= 0) {
+																dac.setVoltage(0, false);
 								}
 }
 
@@ -199,29 +198,31 @@ void getADC(){
 								}
 								Vin = vintemp / 10;
 								currentDraw = currtemp/10;
-								if (Vin != 0) Vin = Vin+ 148;
 }
 
 void updateDisp(){
 								getADC();
 								lcd.setCursor(0, 1);
-								lcd.print("Enc: ");
-								lcd.print(rot_enc);
-								bargraph(rot_enc*10, 2,410);
+								lcd.print("Dac:     ");
+								lcd.setCursor(5, 1);
+
+								int dacset = rot_enc*10;
+								lcd.print(dacset);
+								bargraph(dacset, 2,410);
 
 								lcd.setCursor(0, 3);
 								lcd.print("I: ");
 								lcd.print("     ");
 								lcd.setCursor(3, 3);
 
-								lcd.print(currentDraw / 4.4791, 1);
+								lcd.print(currentDraw);
 								lcd.print("mA");
 
 								lcd.setCursor(11, 3);
 								lcd.print("V: ");
 								lcd.print("     ");
 								lcd.setCursor(14, 3);
-								lcd.print(Vin / 561.5714, 1);
+								lcd.print(Vin);
 								status();
 
 }
