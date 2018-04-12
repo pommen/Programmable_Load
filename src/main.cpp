@@ -51,7 +51,6 @@ void debounce();
 void getADC();
 void status();
 
-
 //Vars:
 int lastEncVal =0;
 int deboundeTime = 0;
@@ -60,11 +59,16 @@ int clickHeldTime =0;
 float blockTemp =0.0;
 int temptime =0;
 int currentDraw =0;
+int currentDrawOLD =99;
 int Vin =0;
+int VinOLD =99;
 int lcdUpdateTime = 500;
 int vintemp =0;
 int rot_EncA_Value =0;
 volatile int rot_enc =0;
+int dacset = 0;
+int dacsetOld=99;
+long int accelTimer=0;
 
 //pins:
 const int fanOut = PA7;
@@ -78,10 +82,12 @@ const int compratorPin = PA11;
 const int trig = PA4;
 const int fetTemp = PA0;
 const int tempAlarm = PA8;
+
 //custom files:
 #include <enc.h>
 #include <LCDBargraph.h>
 #include <I2CscannerLCD.h>
+#include <Sorting.h>
 //custom chars:
 uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
 uint8_t graph1[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
@@ -135,11 +141,11 @@ void setup(){
 
 
 								ads.begin();
-								//ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+								//	ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
 
 								//40V = 0.76V, 3.8A=0.47V
 
-								ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+								//ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
 								//i2cScanner();
 								attachInterrupt(rot_EncB, Rot_enc_ISR, FALLING);
 								digitalWrite(loadEnabledPin, LOW);
@@ -149,9 +155,23 @@ void setup(){
 void loop(){
 
 
-								if (millis() - lcdUpdateTime >= 1000) updateDisp();
 
-								setDAC();
+								if (millis() - lcdUpdateTime >= 1000) updateDisp();
+								if (rot_enc != dacset) {
+																if (rot_enc < 0) {
+																								dacset = 0;
+																}
+																else if (rot_enc > 4096) {
+																								dacset = 4095;
+																}
+																else dacset=rot_enc;
+
+																setDAC();
+								}
+								if (rot_EncBTN == HIGH) {
+																dacset = 0;
+																setDAC();
+								}
 								//clickHeldTime = millis();
 
 //writes the coolingblock temperatur every sec
@@ -174,10 +194,8 @@ void loop(){
 
 
 void setDAC(){
-								if (rot_enc >0) dac.setVoltage(rot_enc*10, false);
-								if (rot_enc <= 0) {
-																dac.setVoltage(0, false);
-								}
+								if (rot_enc >0) dac.setVoltage(dacset, false);
+
 }
 
 void status(){
@@ -189,40 +207,61 @@ void status(){
 								lcd.print(ina219.getCurrent_mA(), 1);
 }
 
-void getADC(){
-								int vintemp =0;
-								int currtemp =0;
-								for (size_t i = 0; i < 10; i++) {
-																vintemp = vintemp + ads.readADC_Differential_0_1();
-																currtemp = currtemp + ads.readADC_Differential_2_3();
-								}
-								Vin = vintemp / 10;
-								currentDraw = currtemp/10;
+void getADC(){/*
+	                int vintemp[9];
+	                int currtemp[9];
+	                for (size_t i = 0; i < 9; i++) { //tar 10 mätningar
+	                vintemp[i] =  ads.readADC_Differential_0_1();
+	                currtemp[i] = ads.readADC_Differential_2_3();
+	                }
+	                Vin = sorting(vintemp);
+	                currentDraw = sorting(currtemp);
+
+
+	                Vin = ads.readADC_Differential_0_1() * 0.03125;
+	                currentDraw = ads.readADC_Differential_2_3() * 0.03125;
+
+	              */
+								Vin = ads.readADC_Differential_0_1() * 0.1875;
+								currentDraw = ads.readADC_Differential_2_3() * 0.1875;
+
+
+
 }
 
 void updateDisp(){
 								getADC();
-								lcd.setCursor(0, 1);
-								lcd.print("Dac:     ");
-								lcd.setCursor(5, 1);
+								if (dacset != dacsetOld) {
 
-								int dacset = rot_enc*10;
-								lcd.print(dacset);
-								bargraph(dacset, 2,410);
+																lcd.setCursor(0, 1);
+																lcd.print("Dac:     ");
+																lcd.setCursor(5, 1);
 
-								lcd.setCursor(0, 3);
-								lcd.print("I: ");
-								lcd.print("     ");
-								lcd.setCursor(3, 3);
+																lcd.print(dacset);
+																bargraph(dacset, 2,4096);
+																dacsetOld = dacset;
+								}
 
-								lcd.print(currentDraw);
-								lcd.print("mA");
 
-								lcd.setCursor(11, 3);
-								lcd.print("V: ");
-								lcd.print("     ");
-								lcd.setCursor(14, 3);
-								lcd.print(Vin);
+								if (currentDraw != currentDrawOLD) {
+																lcd.setCursor(0, 3);
+																lcd.print("I: ");
+																lcd.print("     ");
+																lcd.setCursor(3, 3);
+																lcd.print(currentDraw);
+																lcd.print("mA");
+																currentDrawOLD = currentDraw;
+								}
+								if (Vin != VinOLD) {
+																/* code */
+
+																lcd.setCursor(11, 3);
+																lcd.print("V: ");
+																lcd.print("     ");
+																lcd.setCursor(14, 3);
+																lcd.print(Vin);
+																VinOLD = Vin;
+								}
 								status();
 
 }

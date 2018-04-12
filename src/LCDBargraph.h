@@ -1,4 +1,9 @@
 void bargraph(int length, int row, int full){
+
+        //lenght : väarde på dac'en
+        //Row: vilken rad ska vi ha grafen på
+        //full: Max värde vi kmmer att sända (full rad)
+        full=full/100;
         if (length == 0 ) { //Suddar ut om värdet är noll
                 lcd.setCursor(0, row);
                 lcd.print(" ");
