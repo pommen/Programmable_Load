@@ -53,5 +53,6 @@ void i2cScanner(){
                         /* code */
                 }
         }
+        lcd.clear();
 
 }

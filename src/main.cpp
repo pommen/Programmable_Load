@@ -34,11 +34,12 @@
 #include <Adafruit_ADS1015.h>
 #include <Adafruit_INA219.h>
 
-
 Adafruit_INA219 ina219(0x4A);
 LiquidCrystal_I2C lcd(0x3f,20,4);
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 Adafruit_MCP4725 dac;
+// You can also initiate with another address as follows:
+//LM75 sensor(LM75_ADDRESS | 0b001);  // if A0->GND, A1->GND and A2->Vcc
 
 
 
@@ -87,6 +88,7 @@ const int tempAlarm = PA8;
 #include <LCDBargraph.h>
 #include <I2CscannerLCD.h>
 #include <Sorting.h>
+#include <LM75.h>
 //custom chars:
 uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
 uint8_t graph1[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
@@ -129,7 +131,6 @@ void setup(){
 								dac.begin(0x60);
 								dac.setVoltage(0, false);  //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 
-
 								lcd.createChar(0, heart);
 								lcd.createChar(1, graph1);
 								lcd.createChar(2, graph2);
@@ -145,7 +146,7 @@ void setup(){
 								//40V = 0.76V, 3.8A=0.47V
 
 								//ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
-								//i2cScanner();
+								i2cScanner();
 								attachInterrupt(rot_EncB, Rot_enc_ISR, FALLING);
 								//digitalWrite(loadEnabledPin, LOW);
 
@@ -182,11 +183,17 @@ void loop(){
 																blockTemp = (blockTemp  / 4) /10;
 																lcd.setCursor(17,0);
 																lcd.print(blockTemp,0);
-																lcd.write(6);
-																temptime=millis();
+																lcd.write(6);//grader symbolen
+																lcd.setCursor(17,1);
+
+																//lcd.print(sensor.temp(),0);   // call to working lm75 function
+																lcd.write(6); //grader symbolen
+
 																if (blockTemp > 19) {
 																								digitalWrite(fanOut, HIGH);
 																}
+																temptime=millis();
+
 								}
 }
 
