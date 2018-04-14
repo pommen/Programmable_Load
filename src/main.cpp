@@ -35,7 +35,6 @@
 #include <Adafruit_INA219.h>
 
 
-
 Adafruit_INA219 ina219(0x4A);
 LiquidCrystal_I2C lcd(0x3f,20,4);
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
@@ -74,11 +73,11 @@ long int accelTimer=0;
 const int fanOut = PA7;
 const int out2 = PB1;
 const int blockTempPin = PB0;
-const int loadEnabledPin = PA12;
+//const int loadEnabledPin = PA12;
 const int rot_EncA = PA15;
 const int rot_EncB = PB4;
 const int rot_EncBTN = PB5;
-const int compratorPin = PA11;
+//const int compratorPin = PA11;
 const int trig = PA4;
 const int fetTemp = PA0;
 const int tempAlarm = PA8;
@@ -98,15 +97,15 @@ uint8_t graph5[] = {0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
 uint8_t graph6[8] = { 0b11100, 0b10100, 0b11100, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000};
 
 void setup(){
+
 								Wire.begin();
 								Wire.setClock(400000);
 								pinMode(rot_EncA, INPUT);
 								pinMode(rot_EncB, INPUT);
 								pinMode(rot_EncBTN, INPUT);
-								pinMode(loadEnabledPin, OUTPUT);
 								pinMode(fanOut, PWM);
 								pinMode(blockTempPin, INPUT_ANALOG);
-								pinMode(loadEnabledPin, OUTPUT);
+								//pinMode(loadEnabledPin, OUTPUT);
 								lcd.init();  // initialize the lcd
 								lcd.backlight();
 								lcd.print("Programmable Load");
@@ -148,14 +147,14 @@ void setup(){
 								//ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
 								//i2cScanner();
 								attachInterrupt(rot_EncB, Rot_enc_ISR, FALLING);
-								digitalWrite(loadEnabledPin, LOW);
+								//digitalWrite(loadEnabledPin, LOW);
 
 }
 
 void loop(){
 
 
-
+								Serial.println(dacset);
 								if (millis() - lcdUpdateTime >= 1000) updateDisp();
 								if (rot_enc != dacset) {
 																if (rot_enc < 0) {
