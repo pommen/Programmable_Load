@@ -6,7 +6,7 @@ void bargraph(int length, int row, int full){
         full=full/100;
         if (length == 0 ) { //Suddar ut om värdet är noll
                 lcd.setCursor(0, row);
-                lcd.print(" ");
+                lcd.print("                    ");
                 return;
         }
         lastEncVal=length;

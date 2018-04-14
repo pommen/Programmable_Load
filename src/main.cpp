@@ -17,7 +17,8 @@
    DAC:0x60
    ADC:0x48 (72)
    INA219: 0x4A
-   temp sensor:0x68
+   DS3231 (RTC):0x68
+   LM75:
 
    ADC inouts:
               A0:Current set gain (trim to 1.1v @ max steps)
@@ -33,13 +34,12 @@
 #include <Adafruit_MCP4725.h>
 #include <Adafruit_ADS1015.h>
 #include <Adafruit_INA219.h>
+#include <PID_v1.h>
 
 Adafruit_INA219 ina219(0x4A);
 LiquidCrystal_I2C lcd(0x3f,20,4);
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
 Adafruit_MCP4725 dac;
-// You can also initiate with another address as follows:
-//LM75 sensor(LM75_ADDRESS | 0b001);  // if A0->GND, A1->GND and A2->Vcc
 
 
 
@@ -53,25 +53,24 @@ void status();
 
 //Vars:
 int lastEncVal =0;
-int deboundeTime = 0;
 bool clickHeld = false;
 int clickHeldTime =0;
 float blockTemp =0.0;
 int temptime =0;
 int currentDraw =0;
-int currentDrawOLD =99;
+int currentDrawOLD =99; //för att kolla om vi ska uppdatera LCD
 int Vin =0;
-int VinOLD =99;
+int VinOLD =99; //för att kolla om vi ska uppdatera LCD
 int lcdUpdateTime = 500;
 int vintemp =0;
 int rot_EncA_Value =0;
-volatile int rot_enc =0;
-int dacset = 0;
-int dacsetOld=99;
-long int accelTimer=0;
-
+volatile int rot_enc =0; //rotational encoder. needs to volatile. Gets input frpm ISR
+int dacset = 0; //this is the 14 bit numer that we send to the dac.
+int dacsetOld=99; //place holder for dac output. to compare if we need to update
+long int accelTimer=0; //acceleration timer for the rotantion encoder
+long int statusTimer=99;
 //pins:
-const int fanOut = PA7;
+const int out1 = PA7;
 const int out2 = PB1;
 const int blockTempPin = PB0;
 //const int loadEnabledPin = PA12;
@@ -105,7 +104,8 @@ void setup(){
 								pinMode(rot_EncA, INPUT);
 								pinMode(rot_EncB, INPUT);
 								pinMode(rot_EncBTN, INPUT);
-								pinMode(fanOut, PWM);
+								pinMode(out1, OUTPUT);
+								pinMode(out2, OUTPUT);
 								pinMode(blockTempPin, INPUT_ANALOG);
 								//pinMode(loadEnabledPin, OUTPUT);
 								lcd.init();  // initialize the lcd
@@ -118,9 +118,9 @@ void setup(){
 								// you can call a setCalibration function to change this range (see comments).
 								ina219.begin();
 								// To use a slightly lower 32V, 1A range (higher precision on amps):
-								//ina219.setCalibration_32V_1A();
+								ina219.setCalibration_32V_1A();
 								// Or to use a lower 16V, 400mA range (higher precision on volts and amps):
-								ina219.setCalibration_16V_400mA();
+								//		ina219.setCalibration_16V_400mA();
 
 								// For MCP4725A0 the address is 0x60 or 0x61
 								// For MCP4725A2 the address is 0x64 or 0x65
@@ -146,9 +146,11 @@ void setup(){
 								//40V = 0.76V, 3.8A=0.47V
 
 								//ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
-								i2cScanner();
+								//	i2cScanner();
 								attachInterrupt(rot_EncB, Rot_enc_ISR, FALLING);
+
 								//digitalWrite(loadEnabledPin, LOW);
+								analogWrite(out2, 254/2); //cabinett fläkten
 
 }
 
@@ -177,6 +179,7 @@ void loop(){
 
 //writes the coolingblock temperatur every sec
 								if (millis() - temptime >= 1000) {
+
 																lcd.setCursor(17,0);
 																lcd.print("  ");
 																blockTemp = analogRead(blockTempPin);
@@ -184,20 +187,35 @@ void loop(){
 																lcd.setCursor(17,0);
 																lcd.print(blockTemp,0);
 																lcd.write(6);//grader symbolen
-																lcd.setCursor(17,1);
-
+																//lcd.setCursor(17,1);
 																//lcd.print(sensor.temp(),0);   // call to working lm75 function
-																lcd.write(6); //grader symbolen
+																//lcd.write(6); //grader symbolen
 
-																if (blockTemp > 19) {
-																								digitalWrite(fanOut, HIGH);
-																}
+
 																temptime=millis();
 
 								}
+								if (blockTemp > 30) {
+
+																analogWrite(out1, 255-100);
+								}
+								if (blockTemp > 35) {
+
+																analogWrite(out1, 255-150);
+								}
+								if (blockTemp > 40) {
+
+																analogWrite(out1, 255-200);
+								}
+								if (blockTemp > 45) {
+
+																analogWrite(out1, 0);
+								}
+								if (blockTemp < 25) {
+																analogWrite(out1, 255);
+								}
+
 }
-
-
 
 
 void setDAC(){
@@ -206,12 +224,13 @@ void setDAC(){
 }
 
 void status(){
-
+								lcd.setCursor(12, 0);
+								lcd.print("   ");
 								lcd.setCursor(0, 0);
 								lcd.print("V:");
 								lcd.print(ina219.getBusVoltage_V());
 								lcd.print(" mA:");
-								lcd.print(ina219.getCurrent_mA(), 1);
+								lcd.print(ina219.getCurrent_mA(), 0);
 }
 
 void getADC(){/*
@@ -229,15 +248,15 @@ void getADC(){/*
 	                currentDraw = ads.readADC_Differential_2_3() * 0.03125;
 
 	              */
-								Vin = ads.readADC_Differential_0_1() * 0.1875;
-								currentDraw = ads.readADC_Differential_2_3() * 0.1875;
+
+
 
 
 
 }
 
 void updateDisp(){
-								getADC();
+
 								if (dacset != dacsetOld) {
 
 																lcd.setCursor(0, 1);
@@ -248,8 +267,9 @@ void updateDisp(){
 																bargraph(dacset, 2,4096);
 																dacsetOld = dacset;
 								}
+								delay(50);
 
-
+								currentDraw = ads.readADC_Differential_0_1() *0.1875;
 								if (currentDraw != currentDrawOLD) {
 																lcd.setCursor(0, 3);
 																lcd.print("I: ");
@@ -259,18 +279,25 @@ void updateDisp(){
 																lcd.print("mA");
 																currentDrawOLD = currentDraw;
 								}
+								delay(50);
+								Vin = ads.readADC_Differential_2_3();
 								if (Vin != VinOLD) {
 																/* code */
+																float vDisp = (Vin  * 0.01875) / 2;
 
 																lcd.setCursor(11, 3);
 																lcd.print("V: ");
 																lcd.print("     ");
 																lcd.setCursor(14, 3);
-																lcd.print(Vin);
+																lcd.print(vDisp, 2);
 																VinOLD = Vin;
 								}
-								status();
 
+								if (millis() - statusTimer >500) { //uppdatera status varje gång denna slår in
+																/* code */
+																statusTimer = millis();
+																status();
+								}
 }
 
 
