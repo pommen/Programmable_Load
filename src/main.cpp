@@ -34,8 +34,10 @@
 #include <Adafruit_MCP4725.h>
 #include <Adafruit_ADS1015.h>
 #include <Adafruit_INA219.h>
-#include <PID_v1.h>
+#include <RTClib.h>
 
+
+RTC_DS3231 rtc;
 Adafruit_INA219 ina219(0x4A);
 LiquidCrystal_I2C lcd(0x3f,20,4);
 Adafruit_ADS1115 ads;  /* Use this for the 16-bit version */
@@ -50,8 +52,10 @@ void setDAC();
 void debounce();
 void getADC();
 void status();
+void printTime();
 
 //Vars:
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 int lastEncVal =0;
 bool clickHeld = false;
 int clickHeldTime =0;
@@ -69,6 +73,8 @@ int dacset = 0; //this is the 14 bit numer that we send to the dac.
 int dacsetOld=99; //place holder for dac output. to compare if we need to update
 long int accelTimer=0; //acceleration timer for the rotantion encoder
 long int statusTimer=99;
+int loadOn = 0;
+
 //pins:
 const int out1 = PA7;
 const int out2 = PB1;
@@ -87,15 +93,11 @@ const int tempAlarm = PA8;
 #include <LCDBargraph.h>
 #include <I2CscannerLCD.h>
 #include <Sorting.h>
-#include <LM75.h>
-//custom chars:
-uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
-uint8_t graph1[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
-uint8_t graph2[] = {0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18};
-uint8_t graph3[] = {0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c};
-uint8_t graph4[] = {0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e};
-uint8_t graph5[] = {0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f};
-uint8_t graph6[8] = { 0b11100, 0b10100, 0b11100, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000};
+#include <printTime.h>
+#include <TempControl.h>
+#include <LCDsetup.h>
+
+
 
 void setup(){
 
@@ -104,15 +106,14 @@ void setup(){
 								pinMode(rot_EncA, INPUT);
 								pinMode(rot_EncB, INPUT);
 								pinMode(rot_EncBTN, INPUT);
-								pinMode(out1, OUTPUT);
+								pinMode(out1, OUTPUT); //göra om denna till opendrain pwm?
 								pinMode(out2, OUTPUT);
 								pinMode(blockTempPin, INPUT_ANALOG);
+								digitalWrite(out1, HIGH); //stänger av fläkten
+								pinMode(trig, INPUT);
 								//pinMode(loadEnabledPin, OUTPUT);
-								lcd.init();  // initialize the lcd
-								lcd.backlight();
-								lcd.print("Programmable Load");
-								lcd.clear();
-								lcd.setCursor(0, 0 );
+								setupLCD();
+
 								// Initialize the INA219.
 								// By default the initialization will use the largest range (32V, 2A).  However
 								// you can call a setCalibration function to change this range (see comments).
@@ -131,26 +132,19 @@ void setup(){
 								dac.begin(0x60);
 								dac.setVoltage(0, false);  //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 
-								lcd.createChar(0, heart);
-								lcd.createChar(1, graph1);
-								lcd.createChar(2, graph2);
-								lcd.createChar(3, graph3);
-								lcd.createChar(4, graph4);
-								lcd.createChar(5, graph5);
-								lcd.createChar(6, graph6);
-
-
 								ads.begin();
 								//	ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
-
 								//40V = 0.76V, 3.8A=0.47V
-
 								//ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+
+								setupRTC();
+								printTime();
+								delay(3000);
 								//	i2cScanner();
 								attachInterrupt(rot_EncB, Rot_enc_ISR, FALLING);
-
 								//digitalWrite(loadEnabledPin, LOW);
 								analogWrite(out2, 254/2); //cabinett fläkten
+								lcd.clear();
 
 }
 
@@ -159,6 +153,8 @@ void loop(){
 
 								Serial.println(dacset);
 								if (millis() - lcdUpdateTime >= 1000) updateDisp();
+
+
 								if (rot_enc != dacset) {
 																if (rot_enc < 0) {
 																								dacset = 0;
@@ -168,60 +164,29 @@ void loop(){
 																}
 																else dacset=rot_enc;
 
-																setDAC();
 								}
+
+
 								if (digitalRead(rot_EncBTN) == HIGH) {
-																dacset = 0;
-																rot_enc=0;
-																setDAC();
+
 								}
 								//clickHeldTime = millis();
-
+								temperature();
 //writes the coolingblock temperatur every sec
-								if (millis() - temptime >= 1000) {
+								if (digitalRead(trig) == HIGH && loadOn == 0) {
+																dac.setVoltage(dacset, false);
+																loadOn =1;
 
-																lcd.setCursor(17,0);
-																lcd.print("  ");
-																blockTemp = analogRead(blockTempPin);
-																blockTemp = (blockTemp  / 4) /10;
-																lcd.setCursor(17,0);
-																lcd.print(blockTemp,0);
-																lcd.write(6);//grader symbolen
-																//lcd.setCursor(17,1);
-																//lcd.print(sensor.temp(),0);   // call to working lm75 function
-																//lcd.write(6); //grader symbolen
-
-
-																temptime=millis();
-
-								}
-								if (blockTemp > 30) {
-
-																analogWrite(out1, 255-100);
-								}
-								if (blockTemp > 35) {
-
-																analogWrite(out1, 255-150);
-								}
-								if (blockTemp > 40) {
-
-																analogWrite(out1, 255-200);
-								}
-								if (blockTemp > 45) {
-
-																analogWrite(out1, 0);
-								}
-								if (blockTemp < 25) {
-																analogWrite(out1, 255);
+								} else{
+																dacset = 0;
+																rot_enc=0;
+																loadOn =0;
 								}
 
 }
 
 
-void setDAC(){
-								dac.setVoltage(dacset, false);
 
-}
 
 void status(){
 								lcd.setCursor(12, 0);
