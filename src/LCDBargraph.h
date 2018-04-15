@@ -45,7 +45,7 @@ void bargraph(int length, int row, int full){
         if (fullablock<lastEncVal && fullablock>0) {         //sudda ut den gamla om vi går nedåt
                 lcd.setCursor(fullablock+1, row);
                 int clear =19-fullablock;
-                for (size_t i = 0; i < clear; i++) {
+                for (int i = 0; i < clear; i++) {
                         lcd.print(" ");
                 }
         }
