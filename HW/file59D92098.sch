@@ -29,8 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:Peters
-LIBS:bluepill_breakouts
 LIBS:SN74LVC1G14DBVT
 LIBS:ControllerStage-cache
 EELAYER 25 0
@@ -902,9 +900,11 @@ F 3 "" H 7350 1400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LM321 U21
+L LM321-RESCUE-ControllerStage U21
 U 1 1 5ABF4E5A
 P 9650 2200
+AR Path="/5ABF4E5A" Ref="U21"  Part="1" 
+AR Path="/59D92099/5ABF4E5A" Ref="U21"  Part="1" 
 F 0 "U21" H 9650 2500 50  0000 L CNN
 F 1 "LM321" H 9650 2400 50  0000 L CNN
 F 2 "TO_SOT_Packages_SMD:SOT-23-5_HandSoldering" H 9650 2200 50  0001 C CNN

@@ -29,8 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:Peters
-LIBS:bluepill_breakouts
 LIBS:SN74LVC1G14DBVT
 LIBS:ControllerStage-cache
 EELAYER 25 0
@@ -580,9 +578,11 @@ F 3 "" H 10500 4600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LM321 U11
+L LM321-RESCUE-ControllerStage U11
 U 1 1 5A105281
 P 9200 5000
+AR Path="/5A105281" Ref="U11"  Part="1" 
+AR Path="/5A104BC0/5A105281" Ref="U11"  Part="1" 
 F 0 "U11" H 9200 5300 50  0000 L CNN
 F 1 "LM321" H 9200 5200 50  0000 L CNN
 F 2 "TO_SOT_Packages_SMD:SOT-23-5_HandSoldering" H 9200 4850 50  0001 L CNN
@@ -1475,9 +1475,11 @@ $EndComp
 Wire Wire Line
 	2000 5850 2200 5850
 $Comp
-L LM321 U19
+L LM321-RESCUE-ControllerStage U19
 U 1 1 5ABE9BAF
 P 1300 5500
+AR Path="/5ABE9BAF" Ref="U19"  Part="1" 
+AR Path="/5A104BC0/5ABE9BAF" Ref="U19"  Part="1" 
 F 0 "U19" H 1300 5800 50  0000 L CNN
 F 1 "LM321" H 1300 5700 50  0000 L CNN
 F 2 "TO_SOT_Packages_SMD:SOT-23-5_HandSoldering" H 1300 5500 50  0001 C CNN

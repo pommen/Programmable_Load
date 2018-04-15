@@ -66,6 +66,7 @@ int lcdUpdateTime = 500;
 int vintemp = 0;
 int rot_EncA_Value = 0;
 volatile int rot_enc = 0; //rotational encoder. needs to volatile. Gets input frpm ISR
+int rot_encOld = 0;	//used for comparrisson
 int dacset = 0;	    //This is the value translated from Rotenc. not allowed to go under 0
 int dacsetVal = 0;	 //this is the 14 bit numer that we send to the dac.
 int dacsetValOld = 99;    //place holder for dac output. to compare if we need to update
@@ -159,11 +160,12 @@ void loop()
 	if (millis() - lcdUpdateTime >= 1000)
 		updateDisp();
 
-
-
-	dacset = rot_enc;
+	rot_encOld = rot_enc - rot_encOld;
+	dacset = dacset +rot_encOld;
 	if (dacset < 0)
 		dacset = 0;
+
+	rot_encOld = rot_enc;
 
 	if (dacset != dacsetVal)
 	{
@@ -215,6 +217,7 @@ loadOnSwitch = state of switch 0 == pressed
 		}
 	}
 }
+
 void status()
 {
 	lcd.setCursor(12, 0);
