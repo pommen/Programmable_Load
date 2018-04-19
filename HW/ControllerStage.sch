@@ -173,7 +173,7 @@ Text GLabel 9300 4600 2    60   Input ~ 0
 encBTN
 Text GLabel 9300 4800 2    60   Input ~ 0
 encB
-Text GLabel 9300 4700 2    60   Input ~ 0
+Text GLabel 9300 4900 2    60   Input ~ 0
 encA
 $Comp
 L +3.3V #PWR07
@@ -437,8 +437,6 @@ Text GLabel 9300 5100 2    60   Input ~ 0
 comperator
 Text Notes 900  6250 0    60   ~ 0
 14 bits = 4096 steps\n1 step=1mV\n1mV@0.1 Ohm = 10mA \n40AMAX
-Text GLabel 9300 5000 2    60   Input ~ 0
-loadOff
 $Comp
 L PC817 U16
 U 1 1 5ABDD294
@@ -1243,4 +1241,10 @@ Wire Wire Line
 	2700 10200 2700 10400
 Connection ~ 2700 10400
 Connection ~ 2700 10300
+Text Notes 15000 3100 0    60   ~ 0
+FEL footprint
+Text Notes 15050 4650 0    60   ~ 0
+FEL footprint
+Text Notes 2800 9950 0    60   ~ 0
+FEL footprint
 $EndSCHEMATC

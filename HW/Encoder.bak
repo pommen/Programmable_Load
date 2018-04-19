@@ -29,8 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:Peters
-LIBS:bluepill_breakouts
 LIBS:SN74LVC1G14DBVT
 LIBS:ControllerStage-cache
 EELAYER 25 0
