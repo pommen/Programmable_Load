@@ -30,6 +30,9 @@
 #include <Adafruit_INA219.h>
 #include <RTClib.h>
 #include <Bounce2.h>
+#include <EEPROM.h>
+#include <SPI.h>
+#include "SdFat.h"
 
 RTC_DS3231 rtc;
 Adafruit_INA219 ina219(0x4A);
@@ -37,15 +40,19 @@ LiquidCrystal_I2C lcd(0x3f, 20, 4);
 Adafruit_ADS1115 ads; /* Use this for the 16-bit version */
 Adafruit_MCP4725 dac;
 Bounce debouncer = Bounce();
+SdFat SD;
+File dataFile;
 
 //Prototypes:
 void updateDisp();
 void bargraph(int length, int row, int full); //en custom <3 bargrapg för att se % av max
 void inaStatus();
 void printTime();
-void loadSwitching();
-void setupLCD();
-void i2cPot(int steps);
+void loadSwitching(int forceON);
+//void setupLCD();
+void i2cPot(int steps, int wichPot); //0=vsense, 1 = isense
+void setupPots();
+boolean debounce(int pin, int level);
 
 //Vars:
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -74,10 +81,20 @@ boolean loadOnToggelOld = false;
 int loadOnSwitch = 99;
 int temp = 99;
 float vDisp = 99;
+boolean Trigged = false; //flag for trigger state
+int rot_EncBTN_Bounced = 0;
+long menuTimer = 0;
 
 const int VsensePot = 0x2d;
 const int IsensePot = 0x2c;
 int potStep = 0;
+uint potVcal = 0;
+uint16 potVcalAddr = 0;
+uint potIcal = 0;
+uint16 potIcalAddr = 1;
+
+//datalogger vars:
+char fileName[] = "000000000000.CSV";
 
 //pins:
 const int out1 = PA8;	  //GPIO
@@ -92,7 +109,8 @@ const int rot_EncBTN = PA15;  //enocder
 const int trig = PA10; //trigger ingång slår igång last
 //const int fetTemp = PA0;   //NTC limmad på MOSFET
 const int tempAlarm = PB10; //LM75 ... som inte funkar
-
+// SD chip select pin.  Be sure to disable any other SPI devices such as Enet.
+const int chipSelect = PA4;
 const int comperator = PB11;
 
 //custom files:
@@ -103,6 +121,10 @@ const int comperator = PB11;
 #include <printTime.h>
 #include <TempControl.h>
 #include <LCDsetup.h>
+#include <i2cPots.h>
+#include <datalogger.h>
+#include <menu.h>
+
 void setup()
 {
 	Serial.begin(9600);
@@ -123,50 +145,44 @@ void setup()
 	pinMode(fanTach, INPUT);
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, !buildInLedState);
-
 	//pinMode(loadEnabledPin, OUTPUT);
 	debouncer.attach(rot_EncBTN);
 	debouncer.interval(5);
-	digitalWrite(LED_BUILTIN, buildInLedState);
-
-	setupLCD();
-	digitalWrite(LED_BUILTIN, !buildInLedState);
-
-	// Initialize the INA219.
-	// By default the initialization will use the largest range (32V, 2A).  However
-	// you can call a setCalibration function to change this range (see comments).
-
 	ina219.begin();
 	ina219.setCalibration_32V_1A();
 	dac.begin(0x60);
 	dac.setVoltage(0, false); //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 	ads.begin();
+	ads.setGain(GAIN_TWO); // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
 
-
+	digitalWrite(LED_BUILTIN, buildInLedState);
+	setupLCD();
 	setupRTC();
 	printTime();
+	setupSD();
+	setupPots();
+	// calPots();
+	startLoggging();
+	digitalWrite(LED_BUILTIN, !buildInLedState);
 	//i2cScanner();
-
 	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
-
+	delay(2000);
+	lcd.clear();
+	lcd.print(fileName);
+	delay(2000);
 	lcd.clear();
 }
 
 void loop()
 {
-
+	debouncer.update();
+	rot_EncBTN_Bounced = debouncer.read();
 	if (millis() - lcdUpdateTime >= 1000)
 		updateDisp(); //update LCD every sec
 
 	if (rot_enc != rot_encOld) //only update if chaged
 	{
 		int rotDiff = rot_encOld - rot_enc;
-
-		/* 	lcd.setCursor(12, 1);
-		lcd.print("   ");
-		lcd.print(rot_enc);
-		lcd.setCursor(12, 1); */
-
 		dacsetVal += rotDiff;
 		rot_encOld = rot_enc;
 	}
@@ -181,40 +197,130 @@ void loop()
 		dacsetVal = 4095;
 	}
 
-	if (digitalRead(trig) == HIGH) //denna slår på lasten behöver en debounce(bebounce från HW.)
+	//external load on trig forces load on
+	if (debounce(trig, 0) == true)
+	{
+		loadSwitching(1); //(1) force load to switch on
+	}
+	else if (debounce(trig, 1) == true && Trigged == true) //this forces load of if the trigger is relised
+	{
+		loadSwitching(0); //   (0) forces load to switch off
+	}
+	if (rot_EncBTN_Bounced == HIGH)
+	{
+		
+		if (millis() - menuTimer > 1000)
+		{
+			mainMenu();
+			menuTimer = millis();
+		}
+	}
+
+	else
+	{
+		menuTimer = millis();
+	}
+	if (debouncer.fell())
 	{
 		loadOnToggel = !loadOnToggel;
 	}
 
 	if (loadOnToggel != loadOnToggelOld)
 	{
-
-		loadSwitching();
+		loadSwitching(3); // (3) toggles load
 	}
 	temperature(); //writes the coolingblock temperatur every sec and fan control. call often under load
 
 	if (dacsetVal != dacsetValOld && loadOnToggel == true)
 	{
-
 		dac.setVoltage(dacsetVal, false);
-		//updateDisp();
 	}
 }
 
-void loadSwitching()
+boolean debounce(int pin, int level)
 {
+
+	/*
+
+kan vi spara våra variabler i en enum, så vi kan jonglera olika pinnar med samma funktion?
+
+tar in en pin och kollar om den har blivigt testad för debounce förr (behöver en timeout)
+om den har blivit testad förr så kollar vi om det äar dags att testa den igen.
+om den har samma värde så return'ar vi true
+
+
+
+	*/
+	uint bounceTime = 5; //bouncetime, i millis
+	uint timeout = 150;
+	static int pinOld;	 //förra pinnen vi kollade
+	static int valueOld;      //värdet på den förra pinnen
+	static int debounceTimer; //så länge väntar vi innan vi ska kolla igen
+	uint timeSinceLast = millis() - debounceTimer;
+	int value = 0;
+	if (pin == pinOld && timeSinceLast > timeout)
+	{
+		pinOld = 99;
+		valueOld = 99;
+	}
+
+	if (pin != pinOld)
+	{
+		valueOld = digitalRead(pin);
+		debounceTimer = millis();
+		pinOld = pin;
+		return false;
+	}
+
+	if (pin == pinOld && timeSinceLast > bounceTime)
+	{
+		value = digitalRead(pin);
+	}
+	if (value == valueOld && value == level)
+	{
+		return true;
+	}
+	else
+		return false;
+}
+
+void loadSwitching(int forceOn)
+{
+	if (forceOn == 1)
+	{
+		lcd.setCursor(16, 1);
+		lcd.print("    ");
+		lcd.setCursor(16, 1);
+		lcd.print("TRIG");
+		dac.setVoltage(dacsetVal, false);
+		Trigged = true;
+		return;
+	}
+	if (forceOn == 0)
+	{
+		lcd.setCursor(16, 1);
+		lcd.print("    ");
+		lcd.setCursor(17, 1);
+		lcd.print("OFF");
+		dac.setVoltage(0, false);
+		Trigged = false;
+
+		return;
+	}
 
 	if (loadOnToggel == true && loadOnToggelOld != loadOnToggel)
 	{
 		loadOnToggelOld = loadOnToggel;
-		lcd.setCursor(17, 1);
-		lcd.print("   ");
-		lcd.setCursor(17, 1);
+		lcd.setCursor(16, 1);
+		lcd.print("    ");
+		lcd.setCursor(18, 1);
 		lcd.print("ON");
 		dac.setVoltage(dacsetVal, false);
 	}
-	if (loadOnToggel == false && loadOnToggelOld != loadOnToggel)
+	else if (loadOnToggel == false && loadOnToggelOld != loadOnToggel)
 	{
+		lcd.setCursor(16, 1);
+		lcd.print("    ");
 		lcd.setCursor(17, 1);
 		lcd.print("OFF");
 		dac.setVoltage(0, false);
@@ -244,13 +350,18 @@ void updateDisp()
 		lcd.setCursor(5, 1);
 
 		lcd.print(dacsetVal);
+		lcd.setCursor(9, 1);
+		lcd.print("mA Set:     ");
+		lcd.setCursor(15, 1);
+		lcd.print(dacsetVal * 2);
+
 		bargraph(dacsetVal, 2, 4096); //prints the bargrapg to the 3 row
 		dacsetValOld = dacsetVal;
 	}
 
-	delay(50); //adc need some time to shift registers
-	currentDraw = ads.readADC_Differential_0_1() * 1.875;
-	if (currentDraw != currentDrawOLD)//update if value has changed
+	delay(50);						     //adc need some time to shift registers
+	currentDraw = ads.readADC_Differential_0_1() * 0.625; //0.0625mV / bit / 0,1 ohm = amp
+	if (currentDraw != currentDrawOLD)			     //update if value has changed
 	{
 		if (currentDraw < 0)
 			currentDraw = 0; //vill jag verkligen ha denna?
@@ -267,7 +378,7 @@ void updateDisp()
 	Vin = ads.readADC_Differential_2_3();
 	if (Vin != VinOLD) //update if changed
 	{
-		vDisp = (Vin * 0.01875) / 4;
+		vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
 
 		lcd.setCursor(11, 3);
 		lcd.print("V: ");
@@ -285,12 +396,20 @@ void updateDisp()
 	}
 }
 
-void i2cPot(int step) // wichPot 1 = isense, 0= Vsense
+void i2cPot(int step, int wichPot) // wichPot 1 = isense, 0= Vsense
 {
-
+	int address;
+	if (wichPot == 0)
+	{
+		address = VsensePot;
+	}
+	if (wichPot == 1)
+	{
+		address = IsensePot;
+	}
 	byte dataPackage = 131;
 
-	Wire.beginTransmission(VsensePot);
+	Wire.beginTransmission(address);
 	Wire.write(dataPackage);
 	Wire.write(step);
 	Wire.endTransmission();
