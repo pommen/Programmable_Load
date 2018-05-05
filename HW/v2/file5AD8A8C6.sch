@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:v2-rescue
 LIBS:power
 LIBS:device
 LIBS:switches
@@ -31,8 +32,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:Peters
-LIBS:BLUEPILL
 LIBS:v2-cache
 EELAYER 25 0
 EELAYER END
@@ -1332,7 +1331,7 @@ F 3 "" H 3100 4750 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L LM321 U12
+L LM321-RESCUE-v2 U12
 U 1 1 5ADAE55C
 P 9350 1800
 F 0 "U12" H 9350 2100 50  0000 L CNN
@@ -1340,7 +1339,7 @@ F 1 "Temp amp" H 9350 2000 50  0000 L CNN
 F 2 "TO_SOT_Packages_SMD:SOT-23-5" H 9350 1800 50  0001 C CNN
 F 3 "" H 9350 1800 50  0001 C CNN
 	1    9350 1800
-	-1   0    0    1   
+	-1   0    0    -1  
 $EndComp
 $Comp
 L Earth #PWR071

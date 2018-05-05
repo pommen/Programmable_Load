@@ -1,6 +1,4 @@
 /*
-
-
    ==============  Variable load  ================
 
    Currently running on bluepill
@@ -8,7 +6,7 @@
     --------------------
    DAC = 4096 steps (12 bit)
    ADC = 65536 steps (16bit)
-   ref to VCC on breakout
+   ref to Vref 4.096V
     --------------------
 
    I2C addresses:
@@ -17,16 +15,12 @@
    DAC:0x60
    ADC:0x48 (72)
    INA219: 0x4A
-   DS3231 (RTC):0x68
-   LM75:
+   DS3231 (RTC):0x68 (104)
+   LM75B: 0x90 ???s
+   pot 1: (i sense)   2c-44
+   pot 2(volt sense):    2d
 
-   ADC inouts:
-              A0:Current set gain (trim to 1.1v @ max steps)
-              A1:zerocurrent (Trim to 0v at min steps)
-              A2:input volta ge
-              A3:Voltagedrop over shunt
-
- */
+*/
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -44,12 +38,14 @@ Adafruit_ADS1115 ads; /* Use this for the 16-bit version */
 Adafruit_MCP4725 dac;
 Bounce debouncer = Bounce();
 
-//functions:
+//Prototypes:
 void updateDisp();
-void bargraph(int length, int row, int full);
-void status();
+void bargraph(int length, int row, int full); //en custom <3 bargrapg för att se % av max
+void inaStatus();
 void printTime();
 void loadSwitching();
+void setupLCD();
+void i2cPot(int steps);
 
 //Vars:
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -72,26 +68,32 @@ int dacsetVal = 0;	 //this is the 14 bit numer that we send to the dac.
 int dacsetValOld = 99;    //place holder for dac output. to compare if we need to update
 long int accelTimer = 0;  //acceleration timer for the rotantion encoder
 long int statusTimer = 99;
-
+boolean buildInLedState = 0;
 boolean loadOnToggel = 0;
-boolean loadOnToggelOld = 1;
+boolean loadOnToggelOld = false;
 int loadOnSwitch = 99;
-int loadOnSwitchRelised = 99;
-int loadOnSwtichIsPressed = 99;
 int temp = 99;
+float vDisp = 99;
+
+const int VsensePot = 0x2d;
+const int IsensePot = 0x2c;
+int potStep = 0;
 
 //pins:
-const int out1 = PA7;
-const int out2 = PB1;
-const int blockTempPin = PB0;
-//const int loadEnabledPin = PA12;
-const int rot_EncA = PA15;
-const int rot_EncB = PB4;
-const int rot_EncBTN = PB5;
+const int out1 = PA8;	  //GPIO
+const int out2 = PA9;	  //GPIO
+const int blockTempPin = PB1; //internal ADC till temp mätning för MOSFET och power resitor
+const int fanPWM = PB0;	//Fan PWM output
+const int fanTach = PB5;      //fan RPM input
+const int rot_EncA = PB3;     //enocder
+const int rot_EncB = PB4;     //enocder
+const int rot_EncBTN = PA15;  //enocder
 //const int compratorPin = PA11;
-const int trig = PA4;
-const int fetTemp = PA0;
-const int tempAlarm = PA8;
+const int trig = PA10; //trigger ingång slår igång last
+//const int fetTemp = PA0;   //NTC limmad på MOSFET
+const int tempAlarm = PB10; //LM75 ... som inte funkar
+
+const int comperator = PB11;
 
 //custom files:
 #include <enc.h>
@@ -101,12 +103,14 @@ const int tempAlarm = PA8;
 #include <printTime.h>
 #include <TempControl.h>
 #include <LCDsetup.h>
-
 void setup()
 {
-
+	Serial.begin(9600);
+	Serial.println("starting");
 	Wire.begin();
-	Wire.setClock(400000);
+	//Wire.setClock(400000); //fast mode!
+	enableDebugPorts(); //need this to use PB3...for some reason
+
 	pinMode(rot_EncA, INPUT);
 	pinMode(rot_EncB, INPUT);
 	pinMode(rot_EncBTN, INPUT);
@@ -115,110 +119,110 @@ void setup()
 	pinMode(blockTempPin, INPUT_ANALOG);
 	digitalWrite(out1, HIGH); //stänger av fläkten
 	pinMode(trig, INPUT);
+	pinMode(fanPWM, OUTPUT);
+	pinMode(fanTach, INPUT);
+	pinMode(LED_BUILTIN, OUTPUT);
+	digitalWrite(LED_BUILTIN, !buildInLedState);
+
 	//pinMode(loadEnabledPin, OUTPUT);
-	debouncer.attach(trig);
-	debouncer.interval(1);
+	debouncer.attach(rot_EncBTN);
+	debouncer.interval(5);
+	digitalWrite(LED_BUILTIN, buildInLedState);
+
 	setupLCD();
+	digitalWrite(LED_BUILTIN, !buildInLedState);
 
 	// Initialize the INA219.
 	// By default the initialization will use the largest range (32V, 2A).  However
 	// you can call a setCalibration function to change this range (see comments).
-	ina219.begin();
-	// To use a slightly lower 32V, 1A range (higher precision on amps):
-	ina219.setCalibration_32V_1A();
-	// Or to use a lower 16V, 400mA range (higher precision on volts and amps):
-	//		ina219.setCalibration_16V_400mA();
 
-	// For MCP4725A0 the address is 0x60 or 0x61
-	// For MCP4725A2 the address is 0x64 or 0x65
-	//  dac.setVoltage(0, true); Set DAC eeprom frist time to startup as 0
-	// For Adafruit MCP4725A1 the address is 0x62 (default) or 0x63 (ADDR pin tied to VCC)
-	// For MCP4725A0 the address is 0x60 or 0x61
-	// For MCP4725A2 the address is 0x64 or 0x65
+	ina219.begin();
+	ina219.setCalibration_32V_1A();
 	dac.begin(0x60);
 	dac.setVoltage(0, false); //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
-
 	ads.begin();
-	//	ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
-	//40V = 0.76V, 3.8A=0.47V
-	//ads.setGain(GAIN_ONE);         // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+
 
 	setupRTC();
 	printTime();
-	delay(200);
-	//	i2cScanner();
-	attachInterrupt(rot_EncB, Rot_enc_ISR, FALLING);
-	//digitalWrite(loadEnabledPin, LOW);
-	analogWrite(out2, 254 / 2); //cabinett fläkten
+	//i2cScanner();
+
+	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
+
 	lcd.clear();
 }
 
 void loop()
 {
 
-	Serial.println(dacsetVal);
 	if (millis() - lcdUpdateTime >= 1000)
-		updateDisp();
+		updateDisp(); //update LCD every sec
 
-	rot_encOld = rot_enc - rot_encOld;
-	dacset = dacset +rot_encOld;
-	if (dacset < 0)
-		dacset = 0;
-
-	rot_encOld = rot_enc;
-
-	if (dacset != dacsetVal)
+	if (rot_enc != rot_encOld) //only update if chaged
 	{
-		if (rot_enc < 0)
-		{
-			dacsetVal = 0;
-		}
-		else if (rot_enc > 4096)
-		{
-			dacsetVal = 4095;
-		}
-		else
-			dacsetVal = dacset;
+		int rotDiff = rot_encOld - rot_enc;
+
+		/* 	lcd.setCursor(12, 1);
+		lcd.print("   ");
+		lcd.print(rot_enc);
+		lcd.setCursor(12, 1); */
+
+		dacsetVal += rotDiff;
+		rot_encOld = rot_enc;
 	}
 
-	if (digitalRead(rot_EncBTN) == HIGH)
+	//make sure that the dac is with in 12 bit range
+	if (dacsetVal < 0)
 	{
+		dacsetVal = 0;
 	}
-	//clickHeldTime = millis();
-	temperature(); //writes the coolingblock temperatur every sec
+	else if (dacsetVal > 4096)
+	{
+		dacsetVal = 4095;
+	}
 
-	// Update the Bounce instance :
-	loadSwitching();
+	if (digitalRead(trig) == HIGH) //denna slår på lasten behöver en debounce(bebounce från HW.)
+	{
+		loadOnToggel = !loadOnToggel;
+	}
+
+	if (loadOnToggel != loadOnToggelOld)
+	{
+
+		loadSwitching();
+	}
+	temperature(); //writes the coolingblock temperatur every sec and fan control. call often under load
+
+	if (dacsetVal != dacsetValOld && loadOnToggel == true)
+	{
+
+		dac.setVoltage(dacsetVal, false);
+		//updateDisp();
+	}
 }
 
 void loadSwitching()
 {
 
-	/*
-loadOnSwitch = state of switch 0 == pressed
-
-
-	*/
-	debouncer.update();
-	// Get the updated value :
-	loadOnSwitch = debouncer.read();
-
-	if (debouncer.fell())
+	if (loadOnToggel == true && loadOnToggelOld != loadOnToggel)
 	{
-		if (loadOnToggel == 0)
-		{
-			loadOnToggel = 1;
-			dac.setVoltage(dacsetVal, false);
-		}
-		else
-		{
-			loadOnToggel = 0;
-			dac.setVoltage(0, false);
-		}
+		loadOnToggelOld = loadOnToggel;
+		lcd.setCursor(17, 1);
+		lcd.print("   ");
+		lcd.setCursor(17, 1);
+		lcd.print("ON");
+		dac.setVoltage(dacsetVal, false);
 	}
+	if (loadOnToggel == false && loadOnToggelOld != loadOnToggel)
+	{
+		lcd.setCursor(17, 1);
+		lcd.print("OFF");
+		dac.setVoltage(0, false);
+	}
+	loadOnToggelOld = loadOnToggel;
 }
 
-void status()
+void inaStatus()
 {
 	lcd.setCursor(12, 0);
 	lcd.print("   ");
@@ -231,22 +235,8 @@ void status()
 
 void updateDisp()
 {
-	if (loadOnToggel == 1 && loadOnToggel != loadOnToggelOld)
-	{
-		lcd.setCursor(17, 1);
-		lcd.print("   ");
-		lcd.setCursor(17, 1);
-		lcd.print("ON");
-		loadOnToggelOld = loadOnToggel;
-	}
-	if (loadOnToggel == 0 && loadOnToggel != loadOnToggelOld)
-	{
-		lcd.setCursor(17, 1);
-		lcd.print("OFF");
-		loadOnToggelOld = loadOnToggel;
-	}
 
-	if (dacsetVal != dacsetValOld)
+	if (dacsetVal != dacsetValOld) //only print new value is changed
 	{
 
 		lcd.setCursor(0, 1);
@@ -254,14 +244,16 @@ void updateDisp()
 		lcd.setCursor(5, 1);
 
 		lcd.print(dacsetVal);
-		bargraph(dacsetVal, 2, 4096);
+		bargraph(dacsetVal, 2, 4096); //prints the bargrapg to the 3 row
 		dacsetValOld = dacsetVal;
 	}
-	delay(50);
 
-	currentDraw = ads.readADC_Differential_0_1() * 0.1875;
-	if (currentDraw != currentDrawOLD)
+	delay(50); //adc need some time to shift registers
+	currentDraw = ads.readADC_Differential_0_1() * 1.875;
+	if (currentDraw != currentDrawOLD)//update if value has changed
 	{
+		if (currentDraw < 0)
+			currentDraw = 0; //vill jag verkligen ha denna?
 		lcd.setCursor(0, 3);
 		lcd.print("I: ");
 		lcd.print("     ");
@@ -270,12 +262,12 @@ void updateDisp()
 		lcd.print("mA");
 		currentDrawOLD = currentDraw;
 	}
-	delay(50);
+
+	delay(50); //adc need some time to shift registers
 	Vin = ads.readADC_Differential_2_3();
-	if (Vin != VinOLD)
+	if (Vin != VinOLD) //update if changed
 	{
-		/* code */
-		float vDisp = (Vin * 0.01875) / 2;
+		vDisp = (Vin * 0.01875) / 4;
 
 		lcd.setCursor(11, 3);
 		lcd.print("V: ");
@@ -285,14 +277,25 @@ void updateDisp()
 		VinOLD = Vin;
 	}
 
-	if (millis() - statusTimer > 500)
+	if (millis() - statusTimer > 1500)
 	{ //uppdatera status varje gång denna slår in
 		/* code */
 		statusTimer = millis();
-		status();
+		inaStatus();
 	}
 }
 
+void i2cPot(int step) // wichPot 1 = isense, 0= Vsense
+{
+
+	byte dataPackage = 131;
+
+	Wire.beginTransmission(VsensePot);
+	Wire.write(dataPackage);
+	Wire.write(step);
+	Wire.endTransmission();
+	//updateDisp();
+}
 /*
    ADS:
 

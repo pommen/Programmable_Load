@@ -1,4 +1,5 @@
 EESchema Schematic File Version 2
+LIBS:v2-rescue
 LIBS:power
 LIBS:device
 LIBS:switches
@@ -31,8 +32,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:Peters
-LIBS:BLUEPILL
 LIBS:v2-cache
 EELAYER 25 0
 EELAYER END
@@ -751,9 +750,11 @@ F 3 "" H 10050 4000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LM1117-3.3 U21
+L LM1117-3.3-RESCUE-v2 U21
 U 1 1 5ADAB666
 P 5400 2400
+AR Path="/5ADAB666" Ref="U21"  Part="1" 
+AR Path="/5AD8A8B3/5ADAB666" Ref="U21"  Part="1" 
 F 0 "U21" H 5250 2525 50  0000 C CNN
 F 1 "LM1117-3.3" H 5400 2525 50  0000 L CNN
 F 2 "TO_SOT_Packages_SMD:SOT-223-3_TabPin2" H 5400 2400 50  0001 C CNN
