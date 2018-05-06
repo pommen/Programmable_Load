@@ -33,6 +33,8 @@
 #include <EEPROM.h>
 #include <SPI.h>
 #include "SdFat.h"
+#include <LiquidMenu.h>
+
 
 RTC_DS3231 rtc;
 Adafruit_INA219 ina219(0x4A);
@@ -61,7 +63,7 @@ bool clickHeld = false;
 int clickHeldTime = 0;
 float blockTemp = 0.0;
 int temptime = 0;
-int currentDraw = 0;
+float currentDraw = 0;
 int currentDrawOLD = 99; //för att kolla om vi ska uppdatera LCD
 int Vin = 0;
 int VinOLD = 99; //för att kolla om vi ska uppdatera LCD
@@ -154,6 +156,7 @@ void setup()
 	dac.setVoltage(0, false); //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 	ads.begin();
 	ads.setGain(GAIN_TWO); // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
+	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
 
 	digitalWrite(LED_BUILTIN, buildInLedState);
 	setupLCD();
@@ -161,11 +164,10 @@ void setup()
 	printTime();
 	setupSD();
 	setupPots();
-	// calPots();
-	startLoggging();
+	//calPots();
+	//startLoggging();
 	digitalWrite(LED_BUILTIN, !buildInLedState);
 	//i2cScanner();
-	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
 	delay(2000);
 	lcd.clear();
 	lcd.print(fileName);

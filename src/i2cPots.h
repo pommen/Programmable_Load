@@ -1,3 +1,5 @@
+#include <LiquidCrystal_I2C.h>
+
 void setupPots()
 {
 	potVcal = EEPROM.read(potVcalAddr); //load old calibration data for balance pots
@@ -12,7 +14,7 @@ void setupPots()
 	lcd.setCursor(0, 2);
 	lcd.print("i cal: ");
 	lcd.print(potIcal);
-	delay(1000);
+	delay(200);
 	i2cPot(potVcal, 1);
 	delay(100);
 	i2cPot(potIcal, 0);
@@ -23,14 +25,16 @@ void calPots()
 	//vi börjar med att kolla/kaliberar Volt
 	Vin = ads.readADC_Differential_2_3();
 	vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
-	if (vDisp != 0.00)
+	if (vDisp != 10.00)
 	{
 		lcd.clear();
 		lcd.setCursor(0, 0);
 		lcd.print("V-pot need CAL");
 		lcd.setCursor(0, 1);
-		lcd.print("Disconnect all load");
+		lcd.print("Set 10V");
 		lcd.setCursor(0, 2);
+		lcd.print("Set Vsense to local");
+		lcd.setCursor(0, 3);
 		lcd.print("Press BTN to start");
 		while (digitalRead(rot_EncBTN) == LOW)
 		{
@@ -47,7 +51,7 @@ void calPots()
 			lcd.print("  step: ");
 			lcd.print(i);
 			delay(100);
-			if (vDisp == 0.00)
+			if (vDisp == 10.00)
 			{
 				EEPROM.write(potVcalAddr, i);
 				lcd.setCursor(0, 2);
@@ -74,17 +78,35 @@ void calPots()
 	//och sen tar vi stömmen
 	currentDraw = ads.readADC_Differential_0_1() * 0.625;
 
-	if (currentDraw != 0.00)
+	if (currentDraw != 100.00)
 	{
 		lcd.clear();
 		lcd.setCursor(0, 0);
 		lcd.print("I-pot need CAL");
 		lcd.setCursor(0, 1);
-		lcd.print("Disconnect all load");
+		lcd.print("Set 100 mA");
 		lcd.setCursor(0, 2);
 		lcd.print("Press BTN to start");
 		while (digitalRead(rot_EncBTN) == LOW)
 		{
+			if (rot_enc != rot_encOld) //only update if chaged
+			{
+				int rotDiff = rot_encOld - rot_enc;
+				dacsetVal += rotDiff;
+				rot_encOld = rot_enc;
+			}
+
+			//make sure that the dac is with in 12 bit range
+			if (dacsetVal < 0)
+			{
+				dacsetVal = 0;
+			}
+			else if (dacsetVal > 4096)
+			{
+				dacsetVal = 4095;
+			}
+			dac.setVoltage(dacsetVal, false);
+			bargraph(dacsetVal, 3, 4096); //prints the bargrapg to the 3 row
 		}
 		lcd.clear();
 		for (size_t i = 0; i < 255; i++)
@@ -97,7 +119,7 @@ void calPots()
 			lcd.print("  step: ");
 			lcd.print(i);
 			delay(100);
-			if (currentDraw == 0.00)
+			if (currentDraw == 100.00)
 			{
 				EEPROM.write(potIcalAddr, i);
 				lcd.setCursor(0, 2);
@@ -119,5 +141,7 @@ void calPots()
 				}
 			}
 		}
+		dacsetVal = 0;
+		dac.setVoltage(dacsetVal, false);
 	}
 }
