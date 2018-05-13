@@ -225,9 +225,9 @@ void CALmenu()
                     break;
                 case 1:
                     lcd.clear();
-                    lcd.print("Cal Volt");
-                    delay(500);
+                    SWvoltageCal();
                     drawCALmenu();
+                    delay(500);
                     break;
                 case 2:
                     lcd.clear();

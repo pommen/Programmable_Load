@@ -125,8 +125,8 @@ const int chipSelect = PA4; // SD chip select pin.
 #include <LCDsetup.h>
 #include <i2cPots.h>
 #include <datalogger.h>
+#include <SWcal.h>
 #include <menu.h>
-
 void setup()
 {
 	currentDrawCalVal = 1 - currentDrawCalVal;
