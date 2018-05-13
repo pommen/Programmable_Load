@@ -24,139 +24,122 @@ void calPots()
 {
 	loadSwitching(0); //stänger av last
 
-	//vi börjar med att kolla/kaliberar Volt
-	Vin = ads.readADC_Differential_2_3();
-	vDisp = (Vin * 0.3125) / 400; //0.0625mV / bit
-	if (vDisp != 0.00)
+	lcd.clear();
+	lcd.setCursor(0, 0);
+	lcd.print("0 sense CALIBRATION");
+	lcd.setCursor(0, 1);
+	lcd.print("Disconnect load.");
+	lcd.setCursor(0, 2);
+	lcd.print("Set Vsense to local");
+	lcd.setCursor(0, 3);
+	lcd.print("Press BTN to start");
+	while (digitalRead(rot_EncBTN) == HIGH)
 	{
-
-		lcd.clear();
+	}
+	while (digitalRead(rot_EncBTN) == LOW)
+	{
+	}
+	lcd.clear();
+	lcd.setCursor(0, 2);
+	lcd.print("OLD 0V CAL: ");
+	lcd.print(potVcal);
+	for (size_t i = 0; i < 256; i++)
+	{
+		i2cPot(i, VsensePoti2caddr); //step, address
+		wait(50);
+		Vin = ads.readADC_Differential_2_3();
+		vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
 		lcd.setCursor(0, 0);
-		lcd.print("V-pot need CAL");
+		lcd.print("Zero-V CAL");
 		lcd.setCursor(0, 1);
-		lcd.print("Disconnect load");
-		lcd.setCursor(0, 2);
-		lcd.print("Set Vsense to local");
-		lcd.setCursor(0, 3);
-		lcd.print("Press BTN to start");
-		while (digitalRead(rot_EncBTN) == HIGH)
+		lcd.print(vDisp, 3);
+		lcd.print("  @step: ");
+		lcd.print(i);
+		wait(100);
+		if (vDisp < 0.01 && vDisp > -0.01)
 		{
-		}
-		while (digitalRead(rot_EncBTN) == LOW)
-		{
-		}
-		lcd.clear();
-		for (size_t i = 0; i < 255; i++)
-		{
-			i2cPot(i, 0); //0=vsense, 1 = isense
-			wait(50);
-			Vin = ads.readADC_Differential_2_3();
-			vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
-			lcd.setCursor(0, 0);
-			lcd.print("V CAL");
-			lcd.setCursor(0, 1);
-			lcd.print(vDisp, 3);
-			lcd.print("  @step: ");
-			lcd.print(i);
-			wait(100);
-			if (vDisp < 0.01 && vDisp > -0.01)
-			{
-				EEPROM.write(potVcalEEPROMAddr, i);
-				lcd.setCursor(0, 2);
-				lcd.print("cal val: ");
-				lcd.print(i);
+			EEPROM.write(potVcalEEPROMAddr, i);
+			lcd.setCursor(0, 3);
+			lcd.print("NEW 0V CAL: ");
+			/* lcd.print(i);
 				lcd.setCursor(0, 3);
-				lcd.print("Stored Val: ");
-				lcd.print(EEPROM.read(potVcalEEPROMAddr));
-				i2cPot(EEPROM.read(potVcalEEPROMAddr), 1);
-
-				while (digitalRead(rot_EncBTN) == LOW)
-				{
-					Vin = ads.readADC_Differential_2_3();
-					vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
-					lcd.setCursor(0, 0);
-					lcd.print(vDisp, 3);
-				}
-				break;
-			}
-			if (i == 255)
+				lcd.print("Stored Val: "); */
+			lcd.print(EEPROM.read(potVcalEEPROMAddr));
+			i2cPot(EEPROM.read(potVcalEEPROMAddr), VsensePoti2caddr);
+			int timeout = millis();
+			while (digitalRead(rot_EncBTN) == LOW && millis() - timeout < 3000)
 			{
-				lcd.clear();
-				lcd.setCursor(0, 1);
-				lcd.print("V Calibration Failed");
-				while (true)
-				{
-				}
+				Vin = ads.readADC_Differential_2_3();
+				vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
+				lcd.setCursor(0, 0);
+				lcd.print(vDisp, 3);
+			}
+			break;
+		}
+		if (i == 255)
+		{
+			lcd.clear();
+			lcd.setCursor(0, 1);
+			lcd.print("V Calibration Failed");
+			while (true)
+			{
 			}
 		}
 	}
 
 	//och sen tar vi stömmen
-	currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
 
-	if (currentDraw != 0.0)
+	lcd.clear();
+
+	lcd.setCursor(0, 2);
+	lcd.print("OLD 0I CAL: ");
+	lcd.print(potVcal);
+	for (size_t i = 100; i < 256; i++)
 	{
-		loadSwitching(0);
-		lcd.clear();
+		i2cPot(i, IsensePoti2caddr); //step, address
+		wait(100);
+		currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
 		lcd.setCursor(0, 0);
-		lcd.print("I-pot need CAL");
+		lcd.print("Zero-I CAL");
 		lcd.setCursor(0, 1);
-		lcd.print("Disconnect load");
-		lcd.setCursor(0, 2);
-		lcd.print("Press BTN to start");
-		while (digitalRead(rot_EncBTN) == HIGH)
+		lcd.print(currentDraw, 3);
+		lcd.print("  @step: ");
+		lcd.print(i);
+		wait(300);
+		if (currentDraw < 0.005 && currentDraw > -0.005)
 		{
-		}
-		while (digitalRead(rot_EncBTN) == LOW)
-		{
-		}
-		lcd.clear();
-		wait(100); //adc need some time to shift registers
-		for (size_t i = 100; i < 255; i++)
-		{
-			i2cPot(i, 1); //0=vsense, 1 = isense
-			wait(100);
-			currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
-			lcd.setCursor(0, 0);
-			lcd.print("I CAL");
-			lcd.setCursor(0, 1);
-			lcd.print(currentDraw, 3);
-			lcd.print("  @step: ");
-			lcd.print(i);
-			wait(300);
-			if (currentDraw < 0.01 && currentDraw > -0.01)
-			{
-				EEPROM.write(potIcalEEPROMAddr, i);
-				lcd.setCursor(0, 2);
-				lcd.print("cal val: ");
-				lcd.print(i);
+			EEPROM.write(potIcalEEPROMAddr, i);
+			lcd.setCursor(0, 3);
+			lcd.print("NEW 0I CAL: ");
+			/* lcd.print(i);
 				lcd.setCursor(0, 3);
-				lcd.print("Stored Val: ");
-				lcd.print(EEPROM.read(potIcalEEPROMAddr));
-				i2cPot(EEPROM.read(potIcalEEPROMAddr), 0);
+				lcd.print("Stored Val: "); */
+			lcd.print(EEPROM.read(potIcalEEPROMAddr));
+			i2cPot(EEPROM.read(potIcalEEPROMAddr), IsensePoti2caddr);
 
-				while (digitalRead(rot_EncBTN) == LOW)
-				{
-					currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
-					lcd.setCursor(0, 0);
-					lcd.print(currentDraw, 3);
-				}
-				break;
-				//return;
-			}
-			if (i == 255)
+			int timeout = millis();
+			while (digitalRead(rot_EncBTN) == LOW && millis() - timeout < 3000)
 			{
-				lcd.clear();
-				lcd.setCursor(0, 1);
-				lcd.print(" I Calibration Failed");
-				while (true)
-				{
-				}
+				currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
+				lcd.setCursor(0, 0);
+				lcd.print(currentDraw, 3);
+			}
+			break;
+			//return;
+		}
+		if (i == 255)
+		{
+			lcd.clear();
+			lcd.setCursor(0, 1);
+			lcd.print(" I Calibration Failed");
+			while (true)
+			{
 			}
 		}
-		dacsetVal = 0;
-		dac.setVoltage(dacsetVal, false);
 	}
+	dacsetVal = 0;
+	dac.setVoltage(dacsetVal, false);
+
 	lcd.clear();
 }
 

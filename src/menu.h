@@ -118,7 +118,7 @@ void mainMenu() //namn på
                     }
                     drawMainMenu();
                     break;
-                    
+
                 case 1:
                     CALmenu();
 
@@ -145,6 +145,10 @@ void mainMenu() //namn på
             }
         }
     }
+    while (digitalRead(rot_EncBTN) == HIGH)
+    { //wait for button to be let go before exciting, so we dont go to main screen with button pushed
+    }
+    delay(100);
 }
 
 void CALmenu()
@@ -217,12 +221,7 @@ void CALmenu()
                 case 0:
                     calPots();
                     drawCALmenu();
-                    while (digitalRead(rot_EncBTN) == HIGH)
-                    {
-                    }
-                    while (digitalRead(rot_EncBTN) == LOW)
-                    {
-                    }
+                    delay(200);
                     break;
                 case 1:
                     lcd.clear();
@@ -233,16 +232,13 @@ void CALmenu()
                 case 2:
                     lcd.clear();
                     lcd.print("Cal current");
-
                     drawCALmenu();
                     break;
                 case 3:
                     lcd.clear();
-                    lcd.print("Quit");
                     while (digitalRead(rot_EncBTN) == HIGH)
                     {
                     }
-
                     quitMenu = 1;
                     drawMainMenu();
                     break;

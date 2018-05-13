@@ -52,6 +52,7 @@ void i2cPot(int steps, int wichPot); //0=vsense, 1 = isense
 void setupPots();
 void trigger();
 void wait(int wait);
+void forceUpdate();
 
 //Vars:
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -205,9 +206,12 @@ void loop()
 	if (digitalRead(rot_EncBTN) == HIGH)
 		btnPushed = 1;
 
-	if (millis() - clickHeldTimeStart > 1000) //long click
-		mainMenu();				// namn på
-
+	if (millis() - clickHeldTimeStart > 1000)
+	{ //long click
+		mainMenu();
+		toggleLockOutTimer = millis();
+		forceUpdate();
+	}
 	if (loadOnToggel != loadOnToggelOld)
 		loadSwitching(3); // (3) toggles load
 
@@ -289,7 +293,38 @@ void inaStatus()
 	lcd.print(" mA:");
 	lcd.print(ina219.getCurrent_mA(), 0);
 }
-
+void forceUpdate()
+{
+	lcd.setCursor(0, 1);
+	lcd.print("DAC Set:       ");
+	lcd.setCursor(9, 1);
+	lcd.print(dacsetVal);
+	lcd.setCursor(0, 3);
+	lcd.print("I: ");
+	lcd.print("     ");
+	lcd.setCursor(3, 3);
+	lcd.print(currentDraw);
+	lcd.print("mA");
+	vDisp = vDisp * vDispCalVal;
+	lcd.setCursor(11, 3);
+	lcd.print("V: ");
+	lcd.print("     ");
+	lcd.setCursor(14, 3);
+	lcd.print(vDisp, 2);
+	if (fourWireMode == true)
+	{
+		lcd.setCursor(0, 0);
+		lcd.print("4wire Vsense");
+		fourWireModeOld = fourWireMode;
+	}
+	else if (fourWireMode == false)
+	{
+		lcd.setCursor(0, 0);
+		lcd.print("Local Vsense");
+		fourWireModeOld = fourWireMode;
+	}
+	temperature();
+}
 void updateDisp()
 {
 
