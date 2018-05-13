@@ -29,17 +29,20 @@
 #include <Adafruit_ADS1015.h>
 #include <Adafruit_INA219.h>
 #include <RTClib.h>
-#include <Bounce2.h>
 #include <EEPROM.h>
 #include <SPI.h>
 #include "SdFat.h"
+#include "ClickButton.h"
 
 RTC_DS3231 rtc;
 Adafruit_INA219 ina219(0x4A);
 LiquidCrystal_I2C lcd(0x3f, 20, 4);
 Adafruit_ADS1115 ads; /* Use this for the 16-bit version */
 Adafruit_MCP4725 dac;
-Bounce debouncer = Bounce();
+const int rot_EncBTN = PA15; //enocder
+
+ClickButton button(rot_EncBTN, HIGH);
+
 SdFat SD;
 File dataFile;
 
@@ -109,7 +112,7 @@ const int fanPWM = PB0;	//Fan PWM output
 const int fanTach = PB5;      //fan RPM input
 const int rot_EncA = PB3;     //enocder
 const int rot_EncB = PB4;     //enocder
-const int rot_EncBTN = PA15;  //enocder
+//const int rot_EncBTN = PA15;  //enocder definer above in click libary
 const int compratorPin = PB11;
 const int trig = PA10;      //trigger ingång slår igång last
 const int tempAlarm = PB10; //LM75 ... som inte funkar
@@ -151,8 +154,6 @@ void setup()
 	//pinMode(loadEnabledPin, OUTPUT);
 	digitalWrite(LED1, HIGH);
 	digitalWrite(LED2, HIGH);
-	debouncer.attach(rot_EncBTN);
-	debouncer.interval(5);
 	ina219.begin();
 	ina219.setCalibration_32V_1A();
 	dac.begin(0x60);
@@ -160,7 +161,9 @@ void setup()
 	ads.begin();
 	ads.setGain(GAIN_TWO);			      // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
 	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
-
+	button.debounceTime = 5;			      // Debounce timer in ms
+	button.multiclickTime = 250;		      // Time limit for multi clicks
+	button.longClickTime = 1000;		      // time until "held-down clicks" register
 	digitalWrite(LED_BUILTIN, buildInLedState);
 	setupLCD();
 	//setupMenu();
@@ -183,30 +186,17 @@ void setup()
 
 void loop()
 {
-	debouncer.update();
-	rot_EncBTN_Bounced = debouncer.read();
+	button.Update();
+
 	if (millis() - lcdUpdateTime >= 1000)
 		updateDisp(); //update LCD every sec
 
 	read_encoder(); //do encoderstuff get updated values. call often
 	trigger();      //external load on trig forces load on
 
-	if (rot_EncBTN_Bounced == HIGH)
+	if (button.clicks < 0) //long click smaller then 0
 	{
-		menuTimer = millis();
-
-		while (rot_EncBTN_Bounced == HIGH)
-		{
-			debouncer.update();
-			rot_EncBTN_Bounced = debouncer.read();
-			//endless loop while button pressed
-			if (millis() - menuTimer > 1000) //button has been pressed long enough to enter menu
-			{
-				mainMenu(); // namn på
-				menuTimer = millis();
-				toggleLockOutTimer = millis(); //so we dont toggle the load on after exciting the menu
-			}
-		}
+		mainMenu(); // namn på
 	}
 
 	else
@@ -214,7 +204,7 @@ void loop()
 		menuTimer = millis();
 	}
 
-	if (debouncer.fell() && millis() - toggleLockOutTimer > 100)
+	if (button.clicks == 1 && millis() - toggleLockOutTimer > 100)
 	{
 		loadOnToggel = !loadOnToggel;
 		toggleLockOutTimer = millis();
@@ -238,7 +228,7 @@ void loop()
 
 void trigger()
 {
-	if (debounce(trig, 0) == true) ///WE DONT REALLY NEED A DEBOUNCE FUNCTION HERE, JUST A TIMER FUNCTION SO IT DOSEN SPAM. why are I wrting in caps?
+	if (debounce(trig, 0) == true) // debouncing the external trigger
 	{
 		loadSwitching(1); //(1) force load to switch on
 	}

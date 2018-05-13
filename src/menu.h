@@ -35,8 +35,8 @@ void mainMenu() //namn på
        lcd.print("<");
        while (true)
        {
-              debouncer.update();
-              rot_EncBTN_Bounced = debouncer.read();
+              button.Update();
+
               if (rot_enc != rot_encOld) //only update if chaged
               {
                      int rotDiff = rot_encOld - rot_enc;
@@ -63,12 +63,12 @@ void mainMenu() //namn på
                      OLDmenuColPointer = menuColPointer;
               }
 
-              if (rot_EncBTN_Bounced == LOW)
+              if (button.clicks == 0)
               {
                      BTNrelised = true;
               }
 
-              if (rot_EncBTN_Bounced == HIGH && BTNrelised == true)
+              if (button.clicks == 1 && BTNrelised == true)
               {
 
                      switch (menuColPointer)
@@ -78,8 +78,6 @@ void mainMenu() //namn på
                             lcd.print("Menu 0 sel");
                             while (rot_EncBTN_Bounced == LOW)
                             {
-                                   debouncer.update();
-                                   rot_EncBTN_Bounced = debouncer.read();
                             }
                             break;
                      case 1:
@@ -87,8 +85,6 @@ void mainMenu() //namn på
                             lcd.print("Menu 1 sel");
                             while (rot_EncBTN_Bounced == LOW)
                             {
-                                   debouncer.update();
-                                   rot_EncBTN_Bounced = debouncer.read();
                             }
                             break;
                      case 2:
@@ -96,8 +92,6 @@ void mainMenu() //namn på
                             lcd.print("Menu 2 sel");
                             while (rot_EncBTN_Bounced == LOW)
                             {
-                                   debouncer.update();
-                                   rot_EncBTN_Bounced = debouncer.read();
                             }
                             break;
                      case 3:
@@ -105,8 +99,6 @@ void mainMenu() //namn på
                             lcd.print("Menu 3 sel");
                             while (rot_EncBTN_Bounced == LOW)
                             {
-                                   debouncer.update();
-                                   rot_EncBTN_Bounced = debouncer.read();
                             }
                             break;
 
