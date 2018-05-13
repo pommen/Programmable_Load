@@ -33,8 +33,6 @@
 #include <EEPROM.h>
 #include <SPI.h>
 #include "SdFat.h"
-#include <LiquidMenu.h>
-
 
 RTC_DS3231 rtc;
 Adafruit_INA219 ina219(0x4A);
@@ -55,10 +53,14 @@ void loadSwitching(int forceON);
 void i2cPot(int steps, int wichPot); //0=vsense, 1 = isense
 void setupPots();
 boolean debounce(int pin, int level);
+void trigger();
 
 //Vars:
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 int lastEncVal = 0;
+int rot_EncA_Value = 0;
+volatile int rot_enc = 0; //rotational encoder. needs to volatile. Gets input frpm ISR
+int rot_encOld = 0;	//used for comparrisson
 bool clickHeld = false;
 int clickHeldTime = 0;
 float blockTemp = 0.0;
@@ -69,24 +71,24 @@ int Vin = 0;
 int VinOLD = 99; //för att kolla om vi ska uppdatera LCD
 int lcdUpdateTime = 500;
 int vintemp = 0;
-int rot_EncA_Value = 0;
-volatile int rot_enc = 0; //rotational encoder. needs to volatile. Gets input frpm ISR
-int rot_encOld = 0;	//used for comparrisson
-int dacset = 0;	    //This is the value translated from Rotenc. not allowed to go under 0
-int dacsetVal = 0;	 //this is the 14 bit numer that we send to the dac.
-int dacsetValOld = 99;    //place holder for dac output. to compare if we need to update
-long int accelTimer = 0;  //acceleration timer for the rotantion encoder
+int dacset = 0;	   //This is the value translated from Rotenc. not allowed to go under 0
+int dacsetVal = 0;	//this is the 14 bit numer that we send to the dac.
+int dacsetValOld = 99;   //place holder for dac output. to compare if we need to update
+long int accelTimer = 0; //acceleration timer for the rotantion encoder
 long int statusTimer = 99;
 boolean buildInLedState = 0;
 boolean loadOnToggel = 0;
 boolean loadOnToggelOld = false;
 int loadOnSwitch = 99;
+boolean Trigged = false;     //flag for trigger state
+boolean fourWireMode = 0;    //flag for using 4wire.
+boolean fourWireModeOld = 1; //comparison flag
 int temp = 99;
 float vDisp = 99;
-boolean Trigged = false; //flag for trigger state
 int rot_EncBTN_Bounced = 0;
 long menuTimer = 0;
-
+int menu_enc_num = 0;		   //this is the var for the menu options
+unsigned long toggleLockOutTimer = 0; //timer for not spamming toggle
 const int VsensePot = 0x2d;
 const int IsensePot = 0x2c;
 int potStep = 0;
@@ -99,21 +101,20 @@ uint16 potIcalAddr = 1;
 char fileName[] = "000000000000.CSV";
 
 //pins:
-const int out1 = PA8;	  //GPIO
-const int out2 = PA9;	  //GPIO
+const int LED1 = PA1; //LED
+const int LED2 = PA0; //LED
+const int fourWire = PB8;
 const int blockTempPin = PB1; //internal ADC till temp mätning för MOSFET och power resitor
 const int fanPWM = PB0;	//Fan PWM output
 const int fanTach = PB5;      //fan RPM input
 const int rot_EncA = PB3;     //enocder
 const int rot_EncB = PB4;     //enocder
 const int rot_EncBTN = PA15;  //enocder
-//const int compratorPin = PA11;
-const int trig = PA10; //trigger ingång slår igång last
-//const int fetTemp = PA0;   //NTC limmad på MOSFET
+const int compratorPin = PB11;
+const int trig = PA10;      //trigger ingång slår igång last
 const int tempAlarm = PB10; //LM75 ... som inte funkar
-// SD chip select pin.  Be sure to disable any other SPI devices such as Enet.
+// SD chip select pin.
 const int chipSelect = PA4;
-const int comperator = PB11;
 
 //custom files:
 #include <enc.h>
@@ -138,16 +139,18 @@ void setup()
 	pinMode(rot_EncA, INPUT);
 	pinMode(rot_EncB, INPUT);
 	pinMode(rot_EncBTN, INPUT);
-	pinMode(out1, OUTPUT); //göra om denna till opendrain pwm?
-	pinMode(out2, OUTPUT);
+	pinMode(LED1, OUTPUT);
+	pinMode(LED2, OUTPUT);
+	pinMode(fourWire, INPUT_PULLUP);
 	pinMode(blockTempPin, INPUT_ANALOG);
-	digitalWrite(out1, HIGH); //stänger av fläkten
 	pinMode(trig, INPUT);
 	pinMode(fanPWM, OUTPUT);
 	pinMode(fanTach, INPUT);
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, !buildInLedState);
 	//pinMode(loadEnabledPin, OUTPUT);
+	digitalWrite(LED1, HIGH);
+	digitalWrite(LED2, HIGH);
 	debouncer.attach(rot_EncBTN);
 	debouncer.interval(5);
 	ina219.begin();
@@ -155,11 +158,12 @@ void setup()
 	dac.begin(0x60);
 	dac.setVoltage(0, false); //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 	ads.begin();
-	ads.setGain(GAIN_TWO); // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
+	ads.setGain(GAIN_TWO);			      // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
 	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
 
 	digitalWrite(LED_BUILTIN, buildInLedState);
 	setupLCD();
+	//setupMenu();
 	setupRTC();
 	printTime();
 	setupSD();
@@ -167,11 +171,13 @@ void setup()
 	//calPots();
 	//startLoggging();
 	digitalWrite(LED_BUILTIN, !buildInLedState);
+	digitalWrite(LED1, LOW);
+	digitalWrite(LED2, LOW);
 	//i2cScanner();
-	delay(2000);
+	delay(500);
 	lcd.clear();
 	lcd.print(fileName);
-	delay(2000);
+	delay(500);
 	lcd.clear();
 }
 
@@ -182,39 +188,24 @@ void loop()
 	if (millis() - lcdUpdateTime >= 1000)
 		updateDisp(); //update LCD every sec
 
-	if (rot_enc != rot_encOld) //only update if chaged
-	{
-		int rotDiff = rot_encOld - rot_enc;
-		dacsetVal += rotDiff;
-		rot_encOld = rot_enc;
-	}
+	read_encoder(); //do encoderstuff get updated values. call often
+	trigger();      //external load on trig forces load on
 
-	//make sure that the dac is with in 12 bit range
-	if (dacsetVal < 0)
-	{
-		dacsetVal = 0;
-	}
-	else if (dacsetVal > 4096)
-	{
-		dacsetVal = 4095;
-	}
-
-	//external load on trig forces load on
-	if (debounce(trig, 0) == true)
-	{
-		loadSwitching(1); //(1) force load to switch on
-	}
-	else if (debounce(trig, 1) == true && Trigged == true) //this forces load of if the trigger is relised
-	{
-		loadSwitching(0); //   (0) forces load to switch off
-	}
 	if (rot_EncBTN_Bounced == HIGH)
 	{
-		
-		if (millis() - menuTimer > 1000)
+		menuTimer = millis();
+
+		while (rot_EncBTN_Bounced == HIGH)
 		{
-			mainMenu();
-			menuTimer = millis();
+			debouncer.update();
+			rot_EncBTN_Bounced = debouncer.read();
+			//endless loop while button pressed
+			if (millis() - menuTimer > 1000) //button has been pressed long enough to enter menu
+			{
+				mainMenu(); // namn på
+				menuTimer = millis();
+				toggleLockOutTimer = millis(); //so we dont toggle the load on after exciting the menu
+			}
 		}
 	}
 
@@ -222,9 +213,11 @@ void loop()
 	{
 		menuTimer = millis();
 	}
-	if (debouncer.fell())
+
+	if (debouncer.fell() && millis() - toggleLockOutTimer > 100)
 	{
 		loadOnToggel = !loadOnToggel;
+		toggleLockOutTimer = millis();
 	}
 
 	if (loadOnToggel != loadOnToggelOld)
@@ -236,6 +229,22 @@ void loop()
 	if (dacsetVal != dacsetValOld && loadOnToggel == true)
 	{
 		dac.setVoltage(dacsetVal, false);
+	}
+	digitalWrite(LED1, Trigged);
+	digitalWrite(LED2, loadOnToggel);
+	fourWireMode = digitalRead(fourWire);
+	fourWireMode = !fourWireMode; //was active low. need to invert for names to make sense. HIGH when active.
+}
+
+void trigger()
+{
+	if (debounce(trig, 0) == true) ///WE DONT REALLY NEED A DEBOUNCE FUNCTION HERE, JUST A TIMER FUNCTION SO IT DOSEN SPAM. why are I wrting in caps?
+	{
+		loadSwitching(1); //(1) force load to switch on
+	}
+	else if (debounce(trig, 1) == true && Trigged == true) //this forces load of if the trigger is relised
+	{
+		loadSwitching(0); //   (0) forces load to switch off
 	}
 }
 
@@ -347,14 +356,14 @@ void updateDisp()
 	if (dacsetVal != dacsetValOld) //only print new value is changed
 	{
 
-		lcd.setCursor(0, 1);
+		/* lcd.setCursor(0, 1);
 		lcd.print("Dac:     ");
 		lcd.setCursor(5, 1);
+		lcd.print(dacsetVal); */
 
-		lcd.print(dacsetVal);
+		lcd.setCursor(0, 1);
+		lcd.print("mA Set:       ");
 		lcd.setCursor(9, 1);
-		lcd.print("mA Set:     ");
-		lcd.setCursor(15, 1);
 		lcd.print(dacsetVal * 2);
 
 		bargraph(dacsetVal, 2, 4096); //prints the bargrapg to the 3 row
@@ -365,8 +374,7 @@ void updateDisp()
 	currentDraw = ads.readADC_Differential_0_1() * 0.625; //0.0625mV / bit / 0,1 ohm = amp
 	if (currentDraw != currentDrawOLD)			     //update if value has changed
 	{
-		if (currentDraw < 0)
-			currentDraw = 0; //vill jag verkligen ha denna?
+
 		lcd.setCursor(0, 3);
 		lcd.print("I: ");
 		lcd.print("     ");
@@ -389,13 +397,24 @@ void updateDisp()
 		lcd.print(vDisp, 2);
 		VinOLD = Vin;
 	}
+	if (fourWireMode == true && fourWireMode != fourWireModeOld)
+	{
+		lcd.setCursor(0, 0);
+		lcd.print("4wire Vsense");
+		fourWireModeOld = fourWireMode;
+	}
+	else if (fourWireMode == false && fourWireMode != fourWireModeOld)
+	{
+		lcd.setCursor(0, 0);
+		lcd.print("Local Vsense");
+		fourWireModeOld = fourWireMode;
+	}
 
-	if (millis() - statusTimer > 1500)
+	/* if (millis() - statusTimer > 1500)
 	{ //uppdatera status varje gång denna slår in
-		/* code */
 		statusTimer = millis();
 		inaStatus();
-	}
+	} */
 }
 
 void i2cPot(int step, int wichPot) // wichPot 1 = isense, 0= Vsense

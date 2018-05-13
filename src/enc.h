@@ -53,5 +53,24 @@ void Rot_enc_ISR()
                 rot_enc++;
         }
         accelTimer = millis();
-        
+}
+
+void read_encoder()
+{
+        if (rot_enc != rot_encOld) //only update if chaged
+        {
+                int rotDiff = rot_encOld - rot_enc;
+                dacsetVal += rotDiff;
+                rot_encOld = rot_enc;
+        }
+
+        //make sure that the dac is with in 12 bit range
+        if (dacsetVal < 0)
+        {
+                dacsetVal = 0;
+        }
+        else if (dacsetVal > 4096)
+        {
+                dacsetVal = 4095;
+        }
 }
