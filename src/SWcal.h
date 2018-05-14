@@ -1,9 +1,11 @@
 /*
 
-
+#
 
 
 */
+#include <LiquidCrystal_I2C.h>
+
 float voltageRangeCal[] = {
     1.00,  //
     2.00,  //
@@ -82,46 +84,106 @@ void SWvoltageCal();
 
 void SWvoltageCal()
 {
+    int noOfIndex = 3;
+    boolean BTNrelisedlocal = false;
 
-       for (int i = 0; i < 19; i++)
-       {
-              /* code */
-              lcd.setCursor(0, 0);
-              lcd.print("                  ");
-              lcd.setCursor(0, 0);
-              lcd.print("Set voltage to ");
-              lcd.setCursor(0, 1);
-              lcd.print(voltageRange[i]);
-              lcd.setCursor(0, 2);
-              lcd.print("Press BTN ");
-              lcd.setCursor(0, 3);
-              lcd.print("                  ");
-              lcd.setCursor(0, 3);
+    for (int i = 0; i < noOfIndex; i++)
+    {
+        /* code */
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("                  ");
+        lcd.setCursor(0, 0);
+        lcd.print("Set voltage to ");
+        //lcd.setCursor(0, 1);
+        lcd.print(voltageRange[i]);
+        lcd.setCursor(0, 1);
+        lcd.print("Press BTN ");
+        if (digitalRead(rot_EncBTN) == LOW)
+            BTNrelisedlocal = true;
+            else             BTNrelisedlocal = false;
 
-              //lcd.print("to continue");
-              delay(10);
-              Vin = 0;
-              for (int k = 0; i < 9; i++)
-              {
-                     int temp = ads.readADC_Differential_2_3();
-                     Vin = Vin + temp;
-                     delay(100);
-              }
-              Vin = Vin / 10;
-              vDisp = (Vin * 0.625) / 400; //0.0625mV / voltage divider
-              lcd.print(vDisp);
-              float temp = voltageRange[i] / vDisp;
-              temp = temp - voltageRange[i];
-              voltageRangeCal[i] = temp;
-              lcd.print(voltageRangeCal[i]);
-              while (digitalRead(rot_EncBTN) == HIGH)
-              {
-              }
-              while (digitalRead(rot_EncBTN) == LOW)
-              {
-              }
-       }
-       lcd.clear();
-       lcd.print("DONE!");
-       delay(5000);
+
+        while (digitalRead(rot_EncBTN) == LOW || BTNrelisedlocal == false)
+        {
+            if (digitalRead(rot_EncBTN) == LOW)
+                BTNrelisedlocal = true;
+            Vin = ads.readADC_Differential_2_3();
+            vDisp = (Vin * 0.3125) / 400; //0.0625mV / bit
+            lcd.setCursor(0, 2);
+            lcd.print("                  ");
+            lcd.setCursor(0, 2);
+            lcd.print(vDisp);
+            delay(50);
+        }
+
+        /*         delay(10);
+        int minRange = (voltageRange[i] - (voltageRange[i] * 0.1));
+        int maxRange = (voltageRange[i] + (voltageRange[i] * 0.1)); */
+
+        Vin = ads.readADC_Differential_2_3();
+        vDisp = (Vin * 0.3125) / 400; //0.0625mV / bit
+        lcd.print(vDisp);
+        float temp = voltageRange[i] / vDisp; //får skinnaden mellan var ska borde vara, och vad det är
+      /*   temp = temp - voltageRange[i];        //?? vi tar för att få skillnaden i %
+        temp = temp + 1;                      //+1 så vi enkelt kan multiplisera för att göra om raw värde till kaliberat värde */
+        voltageRangeCal[i] = temp;            //skriver caliberings % till minne
+        lcd.print(voltageRangeCal[i]);
+    } //end Calibration loop
+
+    lcd.clear();
+    for (int i = 0; i < noOfIndex; i++) //writes the voltage calibration values to eeprom. note the adressing when doing the same to current
+    {
+        int addr = voltageRangeCalADDR + i;
+        EEPROM.write(addr, voltageRangeCal[i]);
+    }
+
+    for (int i = 0; i < noOfIndex; i++) //check the cal
+    {
+        int addr = voltageRangeCalADDR + i;
+
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Array Val: ");
+        lcd.print(voltageRangeCal[i]);
+        lcd.setCursor(0, 1);
+        lcd.print("EEPROM val: ");
+        lcd.print(EEPROM.read(addr));
+        lcd.setCursor(0, 2);
+        lcd.print("array NO[] : ");
+        lcd.print(i);
+        lcd.setCursor(0, 3);
+        lcd.print("EEPROM ADDR:  ");
+        lcd.print(addr);
+        delay(2000);
+    }
+    lcd.setCursor(0, 3);
+    lcd.print("DONE!");
+    delay(1000);
+
+    lcd.clear();
+    if (digitalRead(rot_EncBTN) == LOW)
+        BTNrelisedlocal = true;
+
+    while (digitalRead(rot_EncBTN) == LOW || BTNrelisedlocal == false)
+    {
+        if (digitalRead(rot_EncBTN) == LOW)
+            BTNrelisedlocal = true;
+
+        Vin = ads.readADC_Differential_2_3();
+        vDisp = (Vin * 0.3125) / 400; //0.0625mV / bit
+                                      //finn vilket kalibering värde vi ska använda
+
+        int witchCalindex = vDisp;
+        vDisp = vDisp * voltageRangeCal[witchCalindex];
+        lcd.setCursor(0, 2);
+        lcd.print("                  ");
+        lcd.setCursor(0, 2);
+        lcd.print(vDisp);
+        lcd.setCursor(0, 1);
+        lcd.print("                  ");
+        lcd.setCursor(0, 1);
+        lcd.print(voltageRangeCal[witchCalindex]);
+        delay(50);
+    }
 }

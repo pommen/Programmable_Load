@@ -46,10 +46,11 @@ char *STATUSmenuItems[] = {
 
 int menuColPointer = 0;
 int OLDmenuColPointer = 0;
-boolean BTNrelised = true;
 
 void mainMenu() //namn på
 {
+    boolean BTNrelised = true;
+
     int quitMenu = 0;
 
     loadSwitching(0);
@@ -153,6 +154,8 @@ void mainMenu() //namn på
 
 void CALmenu()
 {
+    boolean BTNrelised = true;
+ 
     int quitMenu = 0;
 
     /*     char *CALmenuItems[] = {

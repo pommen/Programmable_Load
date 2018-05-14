@@ -63,6 +63,8 @@ int rot_encOld = 0;	//used for comparrisson
 bool clickHeld = false;
 int clickHeldTime = 0;
 int clickHeldTimeStart = 0;
+int btnPushed = 0;
+
 float blockTemp = 0.0;
 int temptime = 0;
 int Vin = 0;
@@ -96,7 +98,8 @@ int potVcal = 0;
 int potVcalEEPROMAddr = 0;
 int potIcal = 0;
 int potIcalEEPROMAddr = 1;
-
+int voltageRangeCalADDR = 2;
+int currantRangeCalADDR = 3;
 //datalogger vars:
 char fileName[] = "000000000000.CSV";
 
@@ -182,7 +185,6 @@ void setup()
 	wait(500);
 	lcd.clear();
 }
-int btnPushed = 0;
 void loop()
 {
 	//i2cPot(dacsetVal, 1); //0=vsense, 1 = isense
@@ -405,6 +407,7 @@ void i2cPot(int step, int address)
 	Wire.endTransmission();
 	//updateDisp();
 }
+
 /*
    ADS:
 
