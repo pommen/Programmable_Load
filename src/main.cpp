@@ -87,8 +87,7 @@ int temp = 99;
 float currentDraw = 0.00;
 float currentDrawOLD = 99.00; //för att kolla om vi ska uppdatera LCD
 float vDisp = 99;
-float currentDrawCalVal = 0.11; //11% too high
-float vDispCalVal = 0.00;
+float currentDrawCalVal = 0.11; //11% too high  vi ändrar denna till samma kaliberingsrutin som på volten.
 
 unsigned long toggleLockOutTimer = 0; //timer for not spamming toggle
 const int VsensePoti2caddr = 0x2d;
@@ -98,8 +97,8 @@ int potVcal = 0;
 int potVcalEEPROMAddr = 0;
 int potIcal = 0;
 int potIcalEEPROMAddr = 1;
-int voltageRangeCalADDR = 2;
-int currantRangeCalADDR = 3;
+int voltageRangeCalADDR = 2; //eeeprom adress till kaliberings värde för volt. slutar voltageCalnoOfIndex efter 2.
+int currantRangeCalADDR = 99; //denna är fejk.
 //datalogger vars:
 char fileName[] = "000000000000.CSV";
 
@@ -133,7 +132,8 @@ const int chipSelect = PA4; // SD chip select pin.
 void setup()
 {
 	currentDrawCalVal = 1 - currentDrawCalVal;
-	vDispCalVal = 1 - vDispCalVal;
+	currantRangeCalADDR = voltageCalnoOfIndex +1; //adressen börjAR EFTER max calVolt slutar
+
 	/* 
 	Serial.begin(9600);
 	Serial.println("starting");
@@ -168,13 +168,13 @@ void setup()
 
 	digitalWrite(LED_BUILTIN, buildInLedState);
 	setupLCD();
-	//setupMenu();
 	setupRTC();
 	printTime();
 	setupSD();
 	setupPots();
-	//calPots();
 	//startLoggging();
+	setupCal();
+
 	digitalWrite(LED_BUILTIN, !buildInLedState);
 	digitalWrite(LED1, LOW);
 	digitalWrite(LED2, LOW);
@@ -307,7 +307,6 @@ void forceUpdate()
 	lcd.setCursor(3, 3);
 	lcd.print(currentDraw);
 	lcd.print("mA");
-	vDisp = vDisp * vDispCalVal;
 	lcd.setCursor(11, 3);
 	lcd.print("V: ");
 	lcd.print("     ");
@@ -367,11 +366,12 @@ void updateDisp()
 	Vin = ads.readADC_Differential_2_3();
 	if (Vin != VinOLD) //update if changed
 	{
-		vDisp = (Vin * 0.3125) / 400; //0.0625mV / bit
-		vDisp = vDisp * vDispCalVal;
+		vDisp = (Vin * 0.3125) / 400;   //0.0625mV / bit
+		vDisp = applyCalVoltage(vDisp); //use our calibration
 		lcd.setCursor(11, 3);
 		lcd.print("V: ");
 		lcd.print("     ");
+
 		lcd.setCursor(14, 3);
 		lcd.print(vDisp, 2);
 		VinOLD = Vin;
