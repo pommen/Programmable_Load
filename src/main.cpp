@@ -51,11 +51,21 @@ void loadSwitching(int forceON);
 void i2cPot(int steps, int wichPot); //0=vsense, 1 = isense
 void setupPots();
 void trigger();
-void wait(int wait);
 void forceUpdate();
+float samples(int pin);
+float readCurrent();
+float readVoltage();
+float voltage(float adc, int gain);
 
 //Vars:
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+adsGain_t gain[6] = {GAIN_TWOTHIRDS, GAIN_ONE, GAIN_TWO, GAIN_FOUR, GAIN_EIGHT, GAIN_SIXTEEN}; // create an array of type adsGain_t, which is a struct in the Adafruit_ADS1015.h library
+int voltageG = 5;
+int currentG = 5;
+
+// set gain to 16x to begin with
+float adc, volt;
+
 int lastEncVal = 0;
 int rot_EncA_Value = 0;
 volatile int rot_enc = 0; //rotational encoder. needs to volatile. Gets input frpm ISR
@@ -87,7 +97,9 @@ int temp = 99;
 float currentDraw = 0.00;
 float currentDrawOLD = 99.00; //för att kolla om vi ska uppdatera LCD
 float vDisp = 99;
-float currentDrawCalVal = 0.11; //11% too high  vi ändrar denna till samma kaliberingsrutin som på volten.
+
+int voltageCalnoOfIndex = 49; //antal voltage cal punkter (max)
+int currentCalnoOfIndex = 20;  //antal current cal puinkter(max)
 
 unsigned long toggleLockOutTimer = 0; //timer for not spamming toggle
 const int VsensePoti2caddr = 0x2d;
@@ -97,8 +109,9 @@ int potVcal = 0;
 int potVcalEEPROMAddr = 0;
 int potIcal = 0;
 int potIcalEEPROMAddr = 1;
-int voltageRangeCalADDR = 2; //eeeprom adress till kaliberings värde för volt. slutar voltageCalnoOfIndex efter 2.
-int currantRangeCalADDR = 99; //denna är fejk.
+int voltageRangeCalADDR = 2;  //eeeprom adress till kaliberings värde för volt. slutar voltageCalnoOfIndex efter 2.
+int currentRangeCalADDR = 99; //denna är fejk.
+int currentRangeADDR = 99;
 //datalogger vars:
 char fileName[] = "000000000000.CSV";
 
@@ -124,20 +137,17 @@ const int chipSelect = PA4; // SD chip select pin.
 #include <Sorting.h>
 #include <printTime.h>
 #include <TempControl.h>
-#include <LCDsetup.h>
+//#include <LCDsetup.h>
 #include <i2cPots.h>
 #include <datalogger.h>
 #include <SWcal.h>
 #include <menu.h>
+
 void setup()
 {
-	currentDrawCalVal = 1 - currentDrawCalVal;
-	currantRangeCalADDR = voltageCalnoOfIndex +1; //adressen börjAR EFTER max calVolt slutar
-
-	/* 
-	Serial.begin(9600);
-	Serial.println("starting");
-	 */
+	//currentDrawCalVal = 1 - currentDrawCalVal;
+	currentRangeCalADDR = voltageCalnoOfIndex + 1; //adressen börjAR EFTER max calVolt slutar
+	currentRangeADDR = currentRangeCalADDR + 1;    //adressen börjAR EFTER max cal current slutar
 	Wire.begin();
 	Wire.setClock(400000); //fast mode!
 	enableDebugPorts();    //need this to use PB3...for some reason
@@ -154,7 +164,6 @@ void setup()
 	pinMode(fanTach, INPUT);
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, !buildInLedState);
-	//pinMode(loadEnabledPin, OUTPUT);
 	digitalWrite(LED1, HIGH);
 	digitalWrite(LED2, HIGH);
 	ina219.begin();
@@ -163,7 +172,9 @@ void setup()
 	dac.setVoltage(0, false); //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 	ads.begin();
 	//ads.setGain(GAIN_TWO);			      // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
-	ads.setGain(GAIN_FOUR);			      // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+	//ads.setGain(GAIN_FOUR);			      // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+	ads.setGain(gain[5]);
+
 	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
 
 	digitalWrite(LED_BUILTIN, buildInLedState);
@@ -174,15 +185,10 @@ void setup()
 	setupPots();
 	//startLoggging();
 	setupCal();
-
 	digitalWrite(LED_BUILTIN, !buildInLedState);
 	digitalWrite(LED1, LOW);
 	digitalWrite(LED2, LOW);
 	//i2cScanner();
-	wait(500);
-	lcd.clear();
-	lcd.print(fileName);
-	wait(500);
 	lcd.clear();
 }
 void loop()
@@ -193,7 +199,7 @@ void loop()
 		updateDisp(); //update LCD every 0.5 sec
 
 	read_encoder(); //do encoderstuff get updated values. call often
-	temperature();  //writes the coolingblock temperatur every sec and fan control. call often under load
+	temperature(0); //writes the coolingblock temperatur every sec and fan control. call often under load
 
 	if (digitalRead(rot_EncBTN) == LOW)
 	{
@@ -241,6 +247,7 @@ void loadSwitching(int forceOn /*1:on 2:off 3:toggle*/) //1:on 2:off 3:toggle
 		lcd.print("TRIG");
 		dac.setVoltage(dacsetVal, false);
 		Trigged = true;
+		digitalWrite(LED2, HIGH);
 		return;
 	}
 	if (forceOn == 0)
@@ -276,15 +283,6 @@ void loadSwitching(int forceOn /*1:on 2:off 3:toggle*/) //1:on 2:off 3:toggle
 	loadOnToggelOld = loadOnToggel;
 }
 
-void wait(int wait) //instead of delay
-{
-
-	int temp = millis();
-
-	while (millis() - temp < wait)
-	{
-	}
-}
 void inaStatus()
 {
 	lcd.setCursor(12, 0);
@@ -324,7 +322,7 @@ void forceUpdate()
 		lcd.print("Local Vsense");
 		fourWireModeOld = fourWireMode;
 	}
-	temperature();
+	temperature(0);
 }
 void updateDisp()
 {
@@ -346,10 +344,12 @@ void updateDisp()
 		dacsetValOld = dacsetVal;
 	}
 
-	wait(50);						      //adc need some time to shift registers
-	currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
-	currentDraw = currentDraw * currentDrawCalVal;
-	currentDraw = currentDraw * 1.03;
+	delay(20); //adc need some time to shift registers
+	//currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
+	/* currentDraw = currentDraw * currentDrawCalVal;
+	currentDraw = currentDraw * 1.03; */
+	currentDraw = readCurrent();
+	currentDraw = applyCalCurrent(currentDraw);
 	if (currentDraw != currentDrawOLD) //update if value has changed
 	{
 
@@ -357,24 +357,25 @@ void updateDisp()
 		lcd.print("I: ");
 		lcd.print("     ");
 		lcd.setCursor(3, 3);
-		lcd.print(currentDraw);
+		lcd.print(currentDraw, 0);
 		lcd.print("mA");
 		currentDrawOLD = currentDraw;
 	}
 
-	wait(50);
-	Vin = ads.readADC_Differential_2_3();
-	if (Vin != VinOLD) //update if changed
+	delay(20);
+	//Vin = ads.readADC_Differential_2_3();
+	vDisp = readVoltage();
+	vDisp = applyCalVoltage(vDisp); //use our calibration
+	if (vDisp != VinOLD)		    //update if changed
 	{
-		vDisp = (Vin * 0.3125) / 400;   //0.0625mV / bit
-		vDisp = applyCalVoltage(vDisp); //use our calibration
+		//vDisp = (Vin * 0.3125) / 400;   //0.0625mV / bit
 		lcd.setCursor(11, 3);
 		lcd.print("V: ");
 		lcd.print("     ");
 
 		lcd.setCursor(14, 3);
 		lcd.print(vDisp, 2);
-		VinOLD = Vin;
+		VinOLD = vDisp;
 	}
 	if (fourWireMode == true && fourWireMode != fourWireModeOld)
 	{
@@ -407,7 +408,138 @@ void i2cPot(int step, int address)
 	Wire.endTransmission();
 	//updateDisp();
 }
+// Perform multiple iterations to get higher accuracy ADC values (reduce noise) ******************************************
+float samples(int pin)
+{
+	float n = 5.0;   // number of iterations to perform
+	float sum = 0.0; //store sum as a 32-bit number
 
+	if (pin == 23) //voltage
+	{
+		for (int i = 0; i < n; i++)
+		{
+			float value = ads.readADC_Differential_2_3();
+
+			sum = sum + value;
+			delay(1); // makes readings slower - probably don't need this delay, but ¯\_(ツ)_/¯
+		}
+		float average = sum / n; //store average as a 32-bit number with decimal accuracy
+		return average;
+	}
+
+	if (pin == 1) //current
+	{
+		for (int i = 0; i < n; i++)
+		{
+			float value = ads.readADC_Differential_0_1();
+
+			sum = sum + value;
+			delay(1); // makes readings slower - probably don't need this delay, but ¯\_(ツ)_/¯
+		}
+		float average = sum / n; //store average as a 32-bit number with decimal accuracy
+		return average;
+	}
+}
+// Get voltage ****************************************************************
+float voltage(float adc, int gain)
+{
+	float V;
+	switch (gain)
+	{
+	case 0: // default 2/3x gain setting for +/- 6.144 V
+		V = adc * 0.0001875;
+		break;
+	case 1: // 1x gain setting for +/- 4.096 V
+		V = adc * 0.000125;
+		break;
+	case 2: // 2x gain setting for +/- 2.048 V
+		V = adc * 0.0000625;
+		break;
+	case 3: // 4x gain setting for +/- 1.024 V
+		V = adc * 0.00003125;
+		break;
+	case 4: // 8x gain setting for +/- 0.512 V
+		V = adc * 0.000015625;
+		break;
+	case 5: // 16x gain setting for +/- 0.256 V
+		V = adc * 0.0000078125;
+		break;
+
+	default:
+		V = 0.0;
+	}
+	return V;
+}
+
+float readCurrent()
+{
+	ads.setGain(gain[currentG]);
+
+	while (1) // this function constantly adjusts the gain to an optimum level
+	{
+
+		adc = samples(1); // get avg ADC value from channel 2-3
+
+		if (adc >= 20000 && currentG > 0) // if ADC is getting pegged at maximum value and is not the widest voltage range already, reduce the gain
+		{
+
+			currentG--;
+			ads.setGain(gain[currentG]);
+			delay(20);
+		}
+		else if (adc <= 7000 && currentG < 5)
+		{
+			// if ADC is reading very low values and is not the lowest voltage range already, increase the gain
+			currentG++;
+			ads.setGain(gain[currentG]);
+			delay(20);
+		}
+		else
+			break;
+	}
+/* 	lcd.setCursor(0, 0);
+	lcd.print(currentG); */
+
+	adc = samples(1);		   // get avg ADC value from channel 2-3
+	volt = voltage(adc, currentG); // convert ADC value to a voltage reading based on the gain
+	volt = volt * 10000;
+	return volt;
+}
+
+float readVoltage()
+{
+	ads.setGain(gain[voltageG]);
+
+	while (1) // this function constantly adjusts the gain to an optimum level
+	{
+
+		adc = samples(23); // get avg ADC value from channel 2-3
+
+		if (adc >= 20000 && voltageG > 0) // if ADC is getting pegged at maximum value and is not the widest voltage range already, reduce the gain
+		{
+
+			voltageG--;
+			ads.setGain(gain[voltageG]);
+			delay(50);
+		}
+		else if (adc <= 7000 && voltageG < 5)
+		{
+			// if ADC is reading very low values and is not the lowest voltage range already, increase the gain
+			voltageG++;
+			ads.setGain(gain[voltageG]);
+			delay(50);
+		}
+		else
+			break;
+	}
+/* 	lcd.setCursor(2, 0);
+	lcd.print(voltageG); */
+
+	adc = samples(23);		   // get avg ADC value from channel 2-3
+	volt = voltage(adc, voltageG); // convert ADC value to a voltage reading based on the gain
+	volt = volt * 26.4;
+	return volt;
+}
 /*
    ADS:
 
@@ -417,12 +549,12 @@ void i2cPot(int step, int address)
    // Setting these values incorrectly may destroy your ADC!
    //                                                                ADS1015  ADS1115
    //                                                                -------  -------
-   // ads.setGain(GAIN_TWOTHIRDS);  // 2/3x gain +/- 6.144V  1 bit = 3mV      0.1875mV (default)
-   // ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
-   // ads.setGain(GAIN_TWO);        // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
-   // ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
-   // ads.setGain(GAIN_EIGHT);      // 8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
-   // ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
+   0// ads.setGain(GAIN_TWOTHIRDS);  // 2/3x gain +/- 6.144V  1 bit = 3mV      0.1875mV (default)
+   1// ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+   2// ads.setGain(GAIN_TWO);        // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
+   3// ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+   4// ads.setGain(GAIN_EIGHT);      // 8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
+   5// ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
 
    ads.begin();
  */

@@ -1,6 +1,6 @@
-void temperature()
+void temperature(int silent)
 {
-        if (millis() - temptime >= 1000)
+        if (millis() - temptime >= 1000 && silent ==0)
         {
 
                 lcd.setCursor(17, 0);

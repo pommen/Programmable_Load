@@ -3,7 +3,7 @@
 void setupPots()
 {
 	potVcal = EEPROM.read(potVcalEEPROMAddr); //load old calibration data for balance pots
-	wait(5);
+	delay(5);
 	potIcal = EEPROM.read(potIcalEEPROMAddr);
 	lcd.clear();
 	lcd.setCursor(0, 0);
@@ -14,11 +14,11 @@ void setupPots()
 	lcd.setCursor(0, 2);
 	lcd.print("i cal: ");
 	lcd.print(potIcal);
-	wait(200);
+	delay(200);
 	i2cPot(potVcal, VsensePoti2caddr);
-	wait(100);
+	delay(100);
 	i2cPot(potIcal, IsensePoti2caddr);
-	wait(100);
+	delay(100);
 }
 void calPots()
 {
@@ -46,7 +46,7 @@ void calPots()
 	for (size_t i = 0; i < 256; i++)
 	{
 		i2cPot(i, VsensePoti2caddr); //step, address
-		wait(50);
+		delay(50);
 		Vin = ads.readADC_Differential_2_3();
 		vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
 		lcd.setCursor(0, 0);
@@ -55,7 +55,7 @@ void calPots()
 		lcd.print(vDisp, 3);
 		lcd.print("  @step: ");
 		lcd.print(i);
-		wait(100);
+		delay(100);
 		if (vDisp < 0.01 && vDisp > -0.01)
 		{
 			EEPROM.write(potVcalEEPROMAddr, i);
@@ -97,7 +97,7 @@ void calPots()
 	for (size_t i = 100; i < 256; i++)
 	{
 		i2cPot(i, IsensePoti2caddr); //step, address
-		wait(100);
+		delay(100);
 		currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
 		lcd.setCursor(0, 0);
 		lcd.print("Zero-I CAL");
@@ -105,7 +105,7 @@ void calPots()
 		lcd.print(currentDraw, 3);
 		lcd.print("  @step: ");
 		lcd.print(i);
-		wait(300);
+		delay(300);
 		if (currentDraw < 0.005 && currentDraw > -0.005)
 		{
 			EEPROM.write(potIcalEEPROMAddr, i);
@@ -166,14 +166,14 @@ void calPots()
 		for (size_t i = 0; i < 255; i++)
 		{
 			i2cPot(i, 0); //0=vsense, 1 = isense
-			 wait(50);
+			 delay(50);
 			Vin = ads.readADC_Differential_2_3();
 			vDisp = (Vin * 0.625) / 400; //0.0625mV / bit
 			lcd.setCursor(0, 0);
 			lcd.print(vDisp, 3);
 			lcd.print("  step: ");
 			lcd.print(i);
-			 wait(100);
+			 delay(100);
 			if (vDisp == 10.00)
 			{
 				EEPROM.write(potVcalAddr, i);
@@ -235,13 +235,13 @@ void calPots()
 		for (size_t i = 0; i < 255; i++)
 		{
 			i2cPot(i, 1); //0=vsense, 1 = isense
-			 wait(50);
+			 delay(50);
 			currentDraw = ads.readADC_Differential_0_1() * 0.625;
 			lcd.setCursor(0, 0);
 			lcd.print(currentDraw, 3);
 			lcd.print("  step: ");
 			lcd.print(i);
-			 wait(100);
+			 delay(100);
 			if (currentDraw == 100.00)
 			{
 				EEPROM.write(potIcalAddr, i);

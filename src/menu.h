@@ -155,7 +155,7 @@ void mainMenu() //namn på
 void CALmenu()
 {
     boolean BTNrelised = true;
- 
+
     int quitMenu = 0;
 
     /*     char *CALmenuItems[] = {
@@ -210,14 +210,12 @@ void CALmenu()
                 lcd.print("<");
                 OLDmenuColPointer = menuColPointer;
             }
-            while (digitalRead(rot_EncBTN) == HIGH)
-            {
-            }
             if (digitalRead(rot_EncBTN) == LOW)
                 BTNrelised = true;
 
             if (digitalRead(rot_EncBTN) == HIGH && BTNrelised == true)
             {
+
 
                 switch (menuColPointer)
                 {
@@ -234,14 +232,14 @@ void CALmenu()
                     break;
                 case 2:
                     lcd.clear();
-                    lcd.print("Cal current");
+                    SWcurrentCal();
                     drawCALmenu();
+                    
                     break;
                 case 3:
                     lcd.clear();
-                    while (digitalRead(rot_EncBTN) == HIGH)
-                    {
-                    }
+                   
+
                     quitMenu = 1;
                     drawMainMenu();
                     break;
