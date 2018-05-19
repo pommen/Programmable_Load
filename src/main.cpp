@@ -98,8 +98,8 @@ float currentDraw = 0.00;
 float currentDrawOLD = 99.00; //för att kolla om vi ska uppdatera LCD
 float vDisp = 99;
 
-int voltageCalnoOfIndex = 49; //antal voltage cal punkter (max)
-int currentCalnoOfIndex = 20;  //antal current cal puinkter(max)
+int voltageCalnoOfIndex = 49; //antal voltage cal punkter (max) 49=50V
+int currentCalnoOfIndex = 28;  //antal current cal puinkter(max) 28=5A
 
 unsigned long toggleLockOutTimer = 0; //timer for not spamming toggle
 const int VsensePoti2caddr = 0x2d;
@@ -426,6 +426,7 @@ float samples(int pin)
 		float average = sum / n; //store average as a 32-bit number with decimal accuracy
 		return average;
 	}
+	
 
 	if (pin == 1) //current
 	{

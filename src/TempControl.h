@@ -1,12 +1,12 @@
 void temperature(int silent)
 {
-        if (millis() - temptime >= 1000 && silent ==0)
+        blockTemp = analogRead(blockTempPin);
+        blockTemp = (blockTemp / 4) / 10;
+        if (millis() - temptime >= 1000 && silent == 0)
         {
 
                 lcd.setCursor(17, 0);
                 lcd.print("  ");
-                blockTemp = analogRead(blockTempPin);
-                blockTemp = (blockTemp / 4) / 10;
                 lcd.setCursor(17, 0);
                 lcd.print(blockTemp, 0);
                 lcd.write(6); //grader symbolen

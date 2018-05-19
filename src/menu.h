@@ -26,7 +26,8 @@ char *CALmenuItems[] = {
     "Cal Pots",    //0
     "Cal Voltage", //1
     "Cal Current", //2
-    "Quit",        //3
+    "Cal Dac"      //3
+    "Quit",        //4
 
 };
 char *DATALOGGINGmenuItems[] = {
@@ -137,6 +138,10 @@ void mainMenu() //namn på
 
                 case 3:
                     lcd.clear();
+                    calDac();
+                    break;
+                case 4:
+                    lcd.clear();
                     quitMenu = 1;
                     break;
 
@@ -216,7 +221,6 @@ void CALmenu()
             if (digitalRead(rot_EncBTN) == HIGH && BTNrelised == true)
             {
 
-
                 switch (menuColPointer)
                 {
                 case 0:
@@ -234,11 +238,10 @@ void CALmenu()
                     lcd.clear();
                     SWcurrentCal();
                     drawCALmenu();
-                    
+
                     break;
                 case 3:
                     lcd.clear();
-                   
 
                     quitMenu = 1;
                     drawMainMenu();

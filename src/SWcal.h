@@ -155,47 +155,49 @@ float currentRange[] = {
     9600,  //
     10000, //
 };
-    int currentRangeTarget[] = {
-        //this is my calibration points, in in milli Ampere's.
-        10,    //
-        20,    //
-        50,    //
-        70,    //
-        100,   //
-        150,   //
-        200,   //
-        250,   //
-        300,   //
-        350,   //
-        400,   //
-        450,   //
-        500,   //
-        600,   //
-        700,   //
-        800,   //
-        900,   //
-        1000,  //
-        1200,  //
-        1400,  //
-        1600,  //
-        1800,  //
-        2000,  //
-        2500,  //
-        3000,  //
-        3600,  //
-        4600,  //
-        5000,  //
-        5600,  //
-        6000,  //
-        6600,  //
-        7000,  //
-        7600,  //
-        8000,  //
-        8600,  //
-        9000,  //
-        9600,  //
-        10000, //
-    };
+int currentRangeTarget[] = {
+    //this is my calibration points, in in milli Ampere's.
+
+    10,    //
+    20,    //
+    50,    //
+    70,    //
+    100,   //
+    150,   //
+    200,   //
+    250,   //
+    300,   //
+    350,   //
+    400,   //
+    450,   //
+    500,   //
+    600,   //
+    700,   //
+    800,   //
+    900,   //
+    1000,  //
+    1200,  //
+    1400,  //
+    1600,  //
+    1800,  //
+    2000,  //
+    2500,  //
+    3000,  //
+    3600,  //
+    4000,   //
+    4600,  //
+    5000,  //
+    5600,  //
+    6000,  //
+    6600,  //
+    7000,  //
+    7600,  //
+    8000,  //
+    8600,  //
+    9000,  //
+    9600,  //
+    10000, //
+};
 float currentRangeCal[] = {
     //holds calibration data read from eeprom in setup
     0.00, //0-10 mA
@@ -277,6 +279,7 @@ void SWvoltageCal();
 float applyCalVoltage(float input);
 void SWcurrentCal();
 float applyCalCurrent(float input);
+float calDac();
 
 void setupCal()
 { /*this function is reading the EEPROM and putting it in to our calibration array*/
@@ -525,7 +528,8 @@ void SWcurrentCal()
                 int rotDiff = rot_encOld - rot_enc;
                 if (currentDraw < 300)
                     actualCurrent += (rotDiff / 10.0);
-                else actualCurrent += rotDiff;
+                else
+                    actualCurrent += rotDiff;
                 rot_encOld = rot_enc;
             }
 
@@ -687,4 +691,8 @@ float applyCalCurrent(float input)
     float outPut = input * ActualCalVal;   // do the calibration caluculation: 2.68 *1.1748 = 3.14865 Volts
 
     return outPut; //return our finnished caluculation
+}
+
+float calDac(){
+
 }
