@@ -26,8 +26,7 @@ char *CALmenuItems[] = {
     "Cal Pots",    //0
     "Cal Voltage", //1
     "Cal Current", //2
-    "Cal Dac"      //3
-    "Quit",        //4
+    "Quit",        //3
 
 };
 char *DATALOGGINGmenuItems[] = {
@@ -137,10 +136,6 @@ void mainMenu() //namn på
                     break;
 
                 case 3:
-                    lcd.clear();
-                    calDac();
-                    break;
-                case 4:
                     lcd.clear();
                     quitMenu = 1;
                     break;

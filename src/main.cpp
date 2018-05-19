@@ -79,13 +79,14 @@ float blockTemp = 0.0;
 int temptime = 0;
 int Vin = 0;
 int VinOLD = 99; //för att kolla om vi ska uppdatera LCD strömförsörjning in
-int lcdUpdateTime = 500;
+long int lcdUpdateTime = 500;
 int vintemp = 0;
 int dacset = 0;	   //This is the value translated from Rotenc. not allowed to go under 0
 int dacsetVal = 0;	//this is the 14 bit numer that we send to the dac.
 int dacsetValOld = 99;   //place holder for dac output. to compare if we need to update
 long int accelTimer = 0; //acceleration timer for the rotantion encoder
-long int statusTimer = 99;
+//long int statusTimer = 99;
+long int quarterSecUpdate = 0;
 boolean buildInLedState = 0;
 boolean loadOnToggel = 0;
 boolean loadOnToggelOld = false;
@@ -99,7 +100,8 @@ float currentDrawOLD = 99.00; //för att kolla om vi ska uppdatera LCD
 float vDisp = 99;
 
 int voltageCalnoOfIndex = 49; //antal voltage cal punkter (max) 49=50V
-int currentCalnoOfIndex = 28;  //antal current cal puinkter(max) 28=5A
+int currentCalnoOfIndex = 28; //antal current cal puinkter(max) 28=5A
+int dacVScurrentADDR = 99;    //fejk
 
 unsigned long toggleLockOutTimer = 0; //timer for not spamming toggle
 const int VsensePoti2caddr = 0x2d;
@@ -148,9 +150,10 @@ void setup()
 	//currentDrawCalVal = 1 - currentDrawCalVal;
 	currentRangeCalADDR = voltageCalnoOfIndex + 1; //adressen börjAR EFTER max calVolt slutar
 	currentRangeADDR = currentRangeCalADDR + 1;    //adressen börjAR EFTER max cal current slutar
+	//dacVScurrentADDR = currentRangeADDR + 1; /not used. for dac cal. too much RAM usage
 	Wire.begin();
-	Wire.setClock(400000); //fast mode!
-	enableDebugPorts();    //need this to use PB3...for some reason
+	Wire.setClock(400000); //fast mode! WROOM
+	enableDebugPorts();    //need this to use PB3...because reasons
 
 	pinMode(rot_EncA, INPUT);
 	pinMode(rot_EncB, INPUT);
@@ -195,11 +198,23 @@ void loop()
 {
 	//i2cPot(dacsetVal, 1); //0=vsense, 1 = isense
 
-	if (millis() - lcdUpdateTime >= 500)
+	if (millis() - lcdUpdateTime >= 500) //do every 500 ms
+	{
 		updateDisp(); //update LCD every 0.5 sec
+	}
+
+	if (millis() - quarterSecUpdate >= 250) // do every 250ms
+	{
+
+		digitalWrite(LED1, Trigged);
+		digitalWrite(LED2, loadOnToggel);
+		fourWireMode = digitalRead(fourWire);
+		fourWireMode = !fourWireMode; //was active low. need to invert for names to make sense. HIGH when active.
+		temperature(0);		  //writes the coolingblock temperatur every sec and fan control. call often under load
+		quarterSecUpdate = millis();
+	}
 
 	read_encoder(); //do encoderstuff get updated values. call often
-	temperature(0); //writes the coolingblock temperatur every sec and fan control. call often under load
 
 	if (digitalRead(rot_EncBTN) == LOW)
 	{
@@ -214,8 +229,8 @@ void loop()
 	if (digitalRead(rot_EncBTN) == HIGH)
 		btnPushed = 1;
 
-	if (millis() - clickHeldTimeStart > 1000)
-	{ //long click
+	if (millis() - clickHeldTimeStart > 1000) //timer to enter menu
+	{						//long click
 		mainMenu();
 		toggleLockOutTimer = millis();
 		forceUpdate();
@@ -230,11 +245,6 @@ void loop()
 		loadSwitching(1);				      //(1) force load to switch on
 	else if (digitalRead(trig) == HIGH && Trigged == true) //this forces load of if the trigger is relised
 		loadSwitching(0);				      //   (0) forces load to switch off
-
-	digitalWrite(LED1, Trigged);
-	digitalWrite(LED2, loadOnToggel);
-	fourWireMode = digitalRead(fourWire);
-	fourWireMode = !fourWireMode; //was active low. need to invert for names to make sense. HIGH when active.
 }
 
 void loadSwitching(int forceOn /*1:on 2:off 3:toggle*/) //1:on 2:off 3:toggle
@@ -326,33 +336,22 @@ void forceUpdate()
 }
 void updateDisp()
 {
-
+	static boolean tickTock;
 	if (dacsetVal != dacsetValOld) //only print new value is changed
 	{
-
-		/* lcd.setCursor(0, 1);
-		lcd.print("Dac:     ");
-		lcd.setCursor(5, 1);
-		lcd.print(dacsetVal); */
-
 		lcd.setCursor(0, 1);
 		lcd.print("DAC Set:       ");
 		lcd.setCursor(9, 1);
 		lcd.print(dacsetVal);
 
-		bargraph(dacsetVal, 2, 4096); //prints the bargrapg to the 3 row
+		bargraph(dacsetVal, 2, 4096); //prints the bargraph to the 3'rd row. scale full row to 4096 steps
 		dacsetValOld = dacsetVal;
 	}
 
-	delay(20); //adc need some time to shift registers
-	//currentDraw = ads.readADC_Differential_0_1() * 0.3125; //03125mV
-	/* currentDraw = currentDraw * currentDrawCalVal;
-	currentDraw = currentDraw * 1.03; */
-	currentDraw = readCurrent();
-	currentDraw = applyCalCurrent(currentDraw);
-	if (currentDraw != currentDrawOLD) //update if value has changed
+	//currentDraw = readCurrent();
+	currentDraw = applyCalCurrent(readCurrent());
+	if (currentDraw != currentDrawOLD && tickTock == 0) //update if value has changed
 	{
-
 		lcd.setCursor(0, 3);
 		lcd.print("I: ");
 		lcd.print("     ");
@@ -360,22 +359,20 @@ void updateDisp()
 		lcd.print(currentDraw, 0);
 		lcd.print("mA");
 		currentDrawOLD = currentDraw;
+		tickTock = 1;
 	}
 
-	delay(20);
-	//Vin = ads.readADC_Differential_2_3();
-	vDisp = readVoltage();
-	vDisp = applyCalVoltage(vDisp); //use our calibration
-	if (vDisp != VinOLD)		    //update if changed
+	//vDisp = readVoltage();
+	vDisp = applyCalVoltage(readVoltage()); // get voltage and use our calibration
+	if (vDisp != VinOLD && tickTock == 1)   //update if changed
 	{
-		//vDisp = (Vin * 0.3125) / 400;   //0.0625mV / bit
 		lcd.setCursor(11, 3);
 		lcd.print("V: ");
 		lcd.print("     ");
-
 		lcd.setCursor(14, 3);
 		lcd.print(vDisp, 2);
 		VinOLD = vDisp;
+		tickTock = 0;
 	}
 	if (fourWireMode == true && fourWireMode != fourWireModeOld)
 	{
@@ -389,33 +386,17 @@ void updateDisp()
 		lcd.print("Local Vsense");
 		fourWireModeOld = fourWireMode;
 	}
-
-	/* if (millis() - statusTimer > 1500)
-	{ //uppdatera status varje gång denna slår in
-		statusTimer = millis();
-		inaStatus();
-	} */
 }
 
-void i2cPot(int step, int address)
-{
-
-	byte dataPackage = 131;
-
-	Wire.beginTransmission(address);
-	Wire.write(dataPackage);
-	Wire.write(step);
-	Wire.endTransmission();
-	//updateDisp();
-}
-// Perform multiple iterations to get higher accuracy ADC values (reduce noise) ******************************************
 float samples(int pin)
-{
+{ // Perform multiple iterations to get higher accuracy ADC values (reduce noise)
+
 	float n = 5.0;   // number of iterations to perform
 	float sum = 0.0; //store sum as a 32-bit number
 
 	if (pin == 23) //voltage
 	{
+
 		for (int i = 0; i < n; i++)
 		{
 			float value = ads.readADC_Differential_2_3();
@@ -423,13 +404,11 @@ float samples(int pin)
 			sum = sum + value;
 			delay(1); // makes readings slower - probably don't need this delay, but ¯\_(ツ)_/¯
 		}
-		float average = sum / n; //store average as a 32-bit number with decimal accuracy
-		return average;
 	}
-	
 
 	if (pin == 1) //current
 	{
+
 		for (int i = 0; i < n; i++)
 		{
 			float value = ads.readADC_Differential_0_1();
@@ -437,13 +416,13 @@ float samples(int pin)
 			sum = sum + value;
 			delay(1); // makes readings slower - probably don't need this delay, but ¯\_(ツ)_/¯
 		}
-		float average = sum / n; //store average as a 32-bit number with decimal accuracy
-		return average;
 	}
+	float average = sum / n; //store average as a 32-bit number with decimal accuracy
+	return average;
 }
-// Get voltage ****************************************************************
 float voltage(float adc, int gain)
-{
+{ // Get voltage ****************************************************************
+
 	float V;
 	switch (gain)
 	{
@@ -468,6 +447,7 @@ float voltage(float adc, int gain)
 
 	default:
 		V = 0.0;
+		break;
 	}
 	return V;
 }
@@ -475,7 +455,6 @@ float voltage(float adc, int gain)
 float readCurrent()
 {
 	ads.setGain(gain[currentG]);
-
 	while (1) // this function constantly adjusts the gain to an optimum level
 	{
 
@@ -486,19 +465,19 @@ float readCurrent()
 
 			currentG--;
 			ads.setGain(gain[currentG]);
-			delay(20);
+			delay(15);
 		}
 		else if (adc <= 7000 && currentG < 5)
 		{
 			// if ADC is reading very low values and is not the lowest voltage range already, increase the gain
 			currentG++;
 			ads.setGain(gain[currentG]);
-			delay(20);
+			delay(15);
 		}
 		else
 			break;
 	}
-/* 	lcd.setCursor(0, 0);
+	/* 	lcd.setCursor(0, 0);
 	lcd.print(currentG); */
 
 	adc = samples(1);		   // get avg ADC value from channel 2-3
@@ -510,7 +489,6 @@ float readCurrent()
 float readVoltage()
 {
 	ads.setGain(gain[voltageG]);
-
 	while (1) // this function constantly adjusts the gain to an optimum level
 	{
 
@@ -521,19 +499,19 @@ float readVoltage()
 
 			voltageG--;
 			ads.setGain(gain[voltageG]);
-			delay(50);
+			delay(15);
 		}
 		else if (adc <= 7000 && voltageG < 5)
 		{
 			// if ADC is reading very low values and is not the lowest voltage range already, increase the gain
 			voltageG++;
 			ads.setGain(gain[voltageG]);
-			delay(50);
+			delay(15);
 		}
 		else
 			break;
 	}
-/* 	lcd.setCursor(2, 0);
+	/* 	lcd.setCursor(2, 0);
 	lcd.print(voltageG); */
 
 	adc = samples(23);		   // get avg ADC value from channel 2-3

@@ -184,7 +184,7 @@ int currentRangeTarget[] = {
     2500,  //
     3000,  //
     3600,  //
-    4000,   //
+    4000,  //
     4600,  //
     5000,  //
     5600,  //
@@ -275,6 +275,8 @@ float currentRangeCal[] = {
 
 };
 
+//float dacVScurrent[200]{};
+
 void SWvoltageCal();
 float applyCalVoltage(float input);
 void SWcurrentCal();
@@ -323,6 +325,15 @@ void setupCal()
         currentRangeCal[i] = temp / 1000.0;
         delay(2);
     }
+/*  dacVscurrent. not used. too RAM heavy
+    for (int i = 0; i < 8191; i++) //current vs dac
+    {
+        int addr = dacVScurrentADDR + i;
+        dacVScurrent[i] = EEPROM.read(addr);
+        dacVScurrent[i] += EEPROM.read(addr + 1) / 100.0;
+
+        delay(2);
+    } */
 }
 
 void SWvoltageCal()
@@ -693,6 +704,85 @@ float applyCalCurrent(float input)
     return outPut; //return our finnished caluculation
 }
 
-float calDac(){
 
+
+void i2cPot(int step, int address)
+{
+	byte dataPackage = 131;
+	Wire.beginTransmission(address);
+	Wire.write(dataPackage);
+	Wire.write(step);
+	Wire.endTransmission();
+	//updateDisp();
 }
+/* 
+float calDac() //not enough RAM to all of this in memory (uses 8192 bytes)
+{
+    boolean BTNrelisedlocal = false;
+
+    lcd.clear();
+    lcd.print("set maximum current");
+
+    int currentSet = 0;
+    while (digitalRead(rot_EncBTN) == LOW || BTNrelisedlocal == false) //använd encodern för att ställa in riktiga värdet
+    {
+        temperature(1);
+        if (digitalRead(rot_EncBTN) == LOW)
+            BTNrelisedlocal = true;
+        if (rot_enc != rot_encOld) //only update if changed
+        {
+            int rotDiff = rot_encOld - rot_enc;
+            currentSet += rotDiff;
+            rot_encOld = rot_enc;
+            if (currentSet < 0)
+                currentSet = 0;
+        }
+        else if (currentSet > 10)
+            currentSet = 10;
+
+        lcd.setCursor(0, 2);
+        lcd.print(currentSet, 1);
+    }
+    int tempdacval = 0;
+    dacsetVal = tempdacval;
+    int addr = dacVScurrentADDR;
+
+    while (currentSet > currentDraw)
+    {
+        temperature(1);
+        dacsetVal = tempdacval;
+        loadSwitching(1);
+        delay(100);                                   //stabilizing time
+        currentDraw = applyCalCurrent(readCurrent()); //fancy nested functions. might not work
+        dacVScurrent[tempdacval] = currentDraw;       //put current draw into array that corresponds with dac steps
+        tempdacval++;
+
+        // EEPROM.write(dacVScurrentADDR + tempdacval, dacVScurrent[tempdacval]); //save to eeprom
+
+        addr = addr + tempdacval;
+        int whatToWriteToEEPROM = currentDraw;           //tar bort fraktionernerna och skriver heltalet (9.39 blir 9)
+                                                         //  currentRange[i] = whatToWriteToEEPROM;               //lagrar heltalet till senare
+        EEPROM.write(addr, whatToWriteToEEPROM);         //sparar på första platsen
+        currentDraw = currentDraw - whatToWriteToEEPROM; // tar bort heltalet. så vi bara har fraktionerna (9,39 blir 0,39)
+        whatToWriteToEEPROM = (currentDraw * 100);       // gör om fraktionerna till heltal 0,39 bli 39
+        addr = addr + 1;                                 //nästa adress
+        EEPROM.write(addr, whatToWriteToEEPROM);         //skriver fraktionerna
+
+        int temp2 = EEPROM.read(addr);
+        if (temp2 != whatToWriteToEEPROM)
+        {
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Something's wrong!");
+            lcd.setCursor(0, 1);
+            lcd.print("when writing the");
+            lcd.setCursor(0, 2);
+            lcd.print("cal too EEPROM");
+            while (true)
+            {
+            }
+        }
+
+    } //end Calibration loop
+}
+ */
