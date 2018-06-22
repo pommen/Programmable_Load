@@ -12,6 +12,7 @@ void drawCALmenu();
 void drawDATALOGGINGmenu();
 void drawSTATUSmenu();
 void CALmenu();
+void DataloggingMenu();
 
 /* void mainMenu();
 void drawMainMenu(); */
@@ -32,7 +33,7 @@ char *CALmenuItems[] = {
 char *DATALOGGINGmenuItems[] = {
     "Start When", //0
     "Stop When",  //1
-    " ",          //2
+    "Interval",   //2
     "Quit",       //3
 
 };
@@ -43,9 +44,6 @@ char *STATUSmenuItems[] = {
     "Quit",    //3
 
 };
-
-int menuColPointer = 0;
-int OLDmenuColPointer = 0;
 
 void mainMenu() //namn på
 {
@@ -128,10 +126,10 @@ void mainMenu() //namn på
 
                 case 2:
                     lcd.clear();
-                    lcd.print("Datalogging");
-                    while (digitalRead(rot_EncBTN) == LOW)
-                    {
-                    }
+                    // lcd.print("Datalogging");
+                    drawDATALOGGINGmenu();
+                    DataloggingMenu();
+
                     drawMainMenu();
                     break;
 
@@ -250,6 +248,138 @@ void CALmenu()
     }
     lcd.clear();
 }
+
+void DataloggingMenu()
+{
+    boolean BTNrelised = true;
+
+    int quitMenu = 0;
+
+    /* char *DATALOGGINGmenuItems[] = {
+    "Start When", //0
+    "Stop When",  //1
+    " ",          //2
+    "Quit",       //3
+
+}; */
+    while (quitMenu != 1)
+    {
+        //set all vars to initaial state, define new eatch time?
+        //clear the scrren
+        //draw menu. use pointer to the array should this be a function, to easlily draw?
+        //draw pointers so we know where we are in the menu
+        //click enc button to enter menu
+
+        drawDATALOGGINGmenu();
+        while (digitalRead(rot_EncBTN) == HIGH)
+        {
+        }
+        lcd.setCursor(0, menuColPointer);
+        lcd.print(">");
+        lcd.setCursor(19, menuColPointer);
+        lcd.print("<");
+        while (quitMenu != 1)
+        {
+
+            if (rot_enc != rot_encOld) //only update if chaged
+            {
+                int rotDiff = rot_encOld - rot_enc;
+                menuColPointer += rotDiff;
+                rot_encOld = rot_enc;
+                if (menuColPointer < 0)
+                {
+                    menuColPointer = 0;
+                }
+                else if (menuColPointer > 3)
+                {
+                    menuColPointer = 3;
+                }
+
+                lcd.setCursor(0, OLDmenuColPointer);
+                lcd.print(" ");
+                lcd.setCursor(19, OLDmenuColPointer);
+                lcd.print(" ");
+
+                lcd.setCursor(0, menuColPointer);
+                lcd.print(">");
+                lcd.setCursor(19, menuColPointer);
+                lcd.print("<");
+                OLDmenuColPointer = menuColPointer;
+            }
+            if (digitalRead(rot_EncBTN) == LOW)
+                BTNrelised = true;
+
+            if (digitalRead(rot_EncBTN) == HIGH && BTNrelised == true)
+            {
+
+                int tempInterval = 0;
+                switch (menuColPointer)
+                {
+                case 0: //    "Start When", //0
+
+                    DATALOGStartWhen();
+                    while (digitalRead(rot_EncBTN) == HIGH)
+                    {
+                        /* code */
+                    }
+                    break;
+                case 1: // "Stop When",  //1
+
+                    lcd.clear();
+                    DATAOGStopWhen();
+                    while (digitalRead(rot_EncBTN) == HIGH)
+                    {
+                        /* code */
+                    }
+                    break;
+                case 2:
+                    lcd.clear();
+                    while (digitalRead(rot_EncBTN) == HIGH)
+                    {
+                        /* code */
+                    }
+                    lcd.clear();
+                    while (digitalRead(rot_EncBTN) == LOW)
+                    {
+                        if (rot_enc != rot_encOld) //only update if chaged
+                        {
+                            int rotDiff = rot_encOld - rot_enc;
+                            tempInterval += rotDiff;
+                            rot_encOld = rot_enc;
+                            lcd.setCursor(2, 10);
+                            lcd.print(tempInterval);
+                        }
+                    }
+                    loggingInterval = tempInterval * 1000;
+                    while (digitalRead(rot_EncBTN) == HIGH)
+                    {
+                        /* code */
+                    }
+                            drawDATALOGGINGmenu();
+
+                    break;
+
+                case 3: //    "Quit",       //3
+
+                    lcd.clear();
+
+                    quitMenu = 1;
+                    drawMainMenu();
+                    while (digitalRead(rot_EncBTN) == HIGH)
+                    {
+                        /* code */
+                    }
+                    break;
+
+                default:
+                    break;
+                }
+            }
+        }
+    }
+    lcd.clear();
+}
+
 void drawMainMenu()
 {
     lcd.clear();

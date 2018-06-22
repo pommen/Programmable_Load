@@ -62,18 +62,31 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 adsGain_t gain[6] = {GAIN_TWOTHIRDS, GAIN_ONE, GAIN_TWO, GAIN_FOUR, GAIN_EIGHT, GAIN_SIXTEEN}; // create an array of type adsGain_t, which is a struct in the Adafruit_ADS1015.h library
 int voltageG = 5;
 int currentG = 5;
-
+int menuColPointer = 0;
+int OLDmenuColPointer = 0;
 // set gain to 16x to begin with
 float adc, volt;
 
 int lastEncVal = 0;
 int rot_EncA_Value = 0;
 volatile int rot_enc = 0; //rotational encoder. needs to volatile. Gets input frpm ISR
-int rot_encOld = 0;	//used for comparrisson
+int rot_encOld = 0;		  //used for comparrisson
 bool clickHeld = false;
 int clickHeldTime = 0;
 int clickHeldTimeStart = 0;
 int btnPushed = 0;
+
+bool startLogOnTrig = 0; //flag for starting datalog on external trig
+bool startBelowFalg = 0;
+bool startAboveFlag = 0;
+bool stoppBelowFalg = 0;
+bool stoppAboveFlag = 0;
+bool startlog = 0;
+bool loggingStarted = 0; //flag for starting datalog
+int loggingInterval = 0;
+long int lastLoggingmillis = 0;
+float VoltageStartLogging = 0.0; //trigger for when to start logging based on vaoltage
+float VoltageStoppLogging = 0.0; //trigger for when to start logging based on vaoltage
 
 float blockTemp = 0.0;
 int temptime = 0;
@@ -81,8 +94,8 @@ int Vin = 0;
 int VinOLD = 99; //för att kolla om vi ska uppdatera LCD strömförsörjning in
 long int lcdUpdateTime = 500;
 int vintemp = 0;
-int dacset = 0;	   //This is the value translated from Rotenc. not allowed to go under 0
-int dacsetVal = 0;	//this is the 14 bit numer that we send to the dac.
+int dacset = 0;			 //This is the value translated from Rotenc. not allowed to go under 0
+int dacsetVal = 0;		 //this is the 14 bit numer that we send to the dac.
 int dacsetValOld = 99;   //place holder for dac output. to compare if we need to update
 long int accelTimer = 0; //acceleration timer for the rotantion encoder
 //long int statusTimer = 99;
@@ -91,8 +104,8 @@ boolean buildInLedState = 0;
 boolean loadOnToggel = 0;
 boolean loadOnToggelOld = false;
 int loadOnSwitch = 99;
-boolean Trigged = false;     //flag for trigger state
-boolean fourWireMode = 0;    //flag for using 4wire.
+boolean Trigged = false;	 //flag for trigger state
+boolean fourWireMode = 0;	//flag for using 4wire.
 boolean fourWireModeOld = 1; //comparison flag
 int temp = 99;
 float currentDraw = 0.00;
@@ -101,7 +114,7 @@ float vDisp = 99;
 
 int voltageCalnoOfIndex = 49; //antal voltage cal punkter (max) 49=50V
 int currentCalnoOfIndex = 28; //antal current cal puinkter(max) 28=5A
-int dacVScurrentADDR = 99;    //fejk
+int dacVScurrentADDR = 99;	//fejk
 
 unsigned long toggleLockOutTimer = 0; //timer for not spamming toggle
 const int VsensePoti2caddr = 0x2d;
@@ -122,13 +135,13 @@ const int LED1 = PA1; //LED
 const int LED2 = PA0; //LED
 const int fourWire = PB8;
 const int blockTempPin = PB1; //internal ADC till temp mätning för MOSFET och power resitor
-const int fanPWM = PB0;	//Fan PWM output
-const int fanTach = PB5;      //fan RPM input
-const int rot_EncA = PB3;     //enocder
-const int rot_EncB = PB4;     //enocder
-const int rot_EncBTN = PA15;  //enocder definer above in click libary
+const int fanPWM = PB0;		  //Fan PWM output
+const int fanTach = PB5;	  //fan RPM input
+const int rot_EncA = PB3;	 //enocder
+const int rot_EncB = PB4;	 //enocder
+const int rot_EncBTN = PA15;  //enocder definer above in click libary, Active HIGH
 const int compratorPin = PB11;
-const int trig = PA10;      //trigger ingång slår igång last
+const int trig = PA10;		//trigger ingång slår igång last
 const int tempAlarm = PB10; //LM75 ... som inte funkar
 const int chipSelect = PA4; // SD chip select pin.
 
@@ -149,11 +162,11 @@ void setup()
 {
 	//currentDrawCalVal = 1 - currentDrawCalVal;
 	currentRangeCalADDR = voltageCalnoOfIndex + 1; //adressen börjAR EFTER max calVolt slutar
-	currentRangeADDR = currentRangeCalADDR + 1;    //adressen börjAR EFTER max cal current slutar
+	currentRangeADDR = currentRangeCalADDR + 1;	//adressen börjAR EFTER max cal current slutar
 	//dacVScurrentADDR = currentRangeADDR + 1; /not used. for dac cal. too much RAM usage
 	Wire.begin();
 	Wire.setClock(400000); //fast mode! WROOM
-	enableDebugPorts();    //need this to use PB3...because reasons
+	enableDebugPorts();	//need this to use PB3...because reasons
 
 	pinMode(rot_EncA, INPUT);
 	pinMode(rot_EncB, INPUT);
@@ -174,8 +187,7 @@ void setup()
 	dac.begin(0x60);
 	dac.setVoltage(0, false); //Set DAC eeprom frist time to startup as 0.00v Do this once per DAC.
 	ads.begin();
-	//ads.setGain(GAIN_TWO);			      // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
-	//ads.setGain(GAIN_FOUR);			      // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+
 	ads.setGain(gain[5]);
 
 	attachInterrupt(rot_EncB, Rot_enc_ISR, RISING); //Rotary encoder
@@ -192,6 +204,7 @@ void setup()
 	digitalWrite(LED1, LOW);
 	digitalWrite(LED2, LOW);
 	//i2cScanner();
+
 	lcd.clear();
 }
 void loop()
@@ -210,7 +223,7 @@ void loop()
 		digitalWrite(LED2, loadOnToggel);
 		fourWireMode = digitalRead(fourWire);
 		fourWireMode = !fourWireMode; //was active low. need to invert for names to make sense. HIGH when active.
-		temperature(0);		  //writes the coolingblock temperatur every sec and fan control. call often under load
+		temperature(0);				  //writes the coolingblock temperatur every sec and fan control. call often under load
 		quarterSecUpdate = millis();
 	}
 
@@ -230,7 +243,7 @@ void loop()
 		btnPushed = 1;
 
 	if (millis() - clickHeldTimeStart > 1000) //timer to enter menu
-	{						//long click
+	{										  //long click
 		mainMenu();
 		toggleLockOutTimer = millis();
 		forceUpdate();
@@ -242,12 +255,88 @@ void loop()
 		dac.setVoltage(dacsetVal, false);
 
 	if (digitalRead(trig) == LOW)
-		loadSwitching(1);				      //(1) force load to switch on
+		loadSwitching(1);								   //(1) force load to switch on
 	else if (digitalRead(trig) == HIGH && Trigged == true) //this forces load of if the trigger is relised
-		loadSwitching(0);				      //   (0) forces load to switch off
+		loadSwitching(0);								   //   (0) forces load to switch off
+
+	///datalogging triggers:
+
+	if (startBelowFalg == 1)
+	{
+		if (vDisp > VoltageStartLogging)
+			startlog = 1;
+	}
+	if (startLogOnTrig == 1)
+	{
+		if (Trigged == 1)
+			startlog = 1;
+	}
+	if (startAboveFlag == 1)
+	{
+		if (vDisp < VoltageStartLogging)
+			startlog = 1;
+	}
+	if (startlog == 1 && loggingStarted != 1)
+	{
+		//setupSD();
+		lcd.clear();
+		lcd.print("logging started");
+		File dataFile = SD.open(fileName, FILE_WRITE);
+
+		// if the file is available, write to it:
+		if (dataFile)
+		{
+			String head = "MS;V;mA";
+			dataFile.println(head);
+			dataFile.close();
+		}
+		loggingStarted = 1;
+		logstartmillis = millis();
+		delay(1000);
+		forceUpdate();
+	}
+	if (millis() - lastLoggingmillis > loggingInterval && loggingStarted == 1)
+	{
+		startLoggging();
+	}
+	/// datalog stop triggers:
+	if (stoppAboveFlag == 1)
+	{
+		if (vDisp > VoltageStoppLogging)
+		{
+			startLogOnTrig = 0; //flag for starting datalog on external trig
+			startBelowFalg = 0;
+			startAboveFlag = 0;
+			stoppBelowFalg = 0;
+			stoppAboveFlag = 0;
+			startlog = 0;
+			loggingStarted = 0; //flag for starting datalog
+			lcd.clear();
+			lcd.print("logging STOPPED");
+			delay(1000);
+			forceUpdate();
+		}
+	}
+
+	if (stoppBelowFalg == 1)
+	{
+		if (vDisp < VoltageStoppLogging)
+		{
+			startLogOnTrig = 0; //flag for starting datalog on external trig
+			startBelowFalg = 0;
+			startAboveFlag = 0;
+			stoppBelowFalg = 0;
+			stoppAboveFlag = 0;
+			startlog = 0;
+			loggingStarted = 0; //flag for starting datalog
+			lcd.clear();
+			lcd.print("logging STOPPED");
+			loadSwitching(0); //turn load off
+		}
+	}
 }
 
-void loadSwitching(int forceOn /*1:on 2:off 3:toggle*/) //1:on 2:off 3:toggle
+void loadSwitching(int forceOn) //1:on 0:off
 {
 	if (forceOn == 1)
 	{
@@ -303,8 +392,10 @@ void inaStatus()
 	lcd.print(" mA:");
 	lcd.print(ina219.getCurrent_mA(), 0);
 }
+
 void forceUpdate()
 {
+	lcd.clear();	
 	lcd.setCursor(0, 1);
 	lcd.print("DAC Set:       ");
 	lcd.setCursor(9, 1);
@@ -337,42 +428,48 @@ void forceUpdate()
 void updateDisp()
 {
 	static boolean tickTock;
-	if (dacsetVal != dacsetValOld) //only print new value is changed
+	if (dacsetVal != dacsetValOld) //only print if value is changed
 	{
 		lcd.setCursor(0, 1);
 		lcd.print("DAC Set:       ");
 		lcd.setCursor(9, 1);
 		lcd.print(dacsetVal);
 
-		bargraph(dacsetVal, 2, 4096); //prints the bargraph to the 3'rd row. scale full row to 4096 steps
+		bargraph(dacsetVal, 2, 4096); //prints the davsetval to bargraph on the 3'rd row. scale full row to 4096 steps
 		dacsetValOld = dacsetVal;
 	}
 
 	//currentDraw = readCurrent();
-	currentDraw = applyCalCurrent(readCurrent());
-	if (currentDraw != currentDrawOLD && tickTock == 0) //update if value has changed
+	if (tickTock == 0)
 	{
-		lcd.setCursor(0, 3);
-		lcd.print("I: ");
-		lcd.print("     ");
-		lcd.setCursor(3, 3);
-		lcd.print(currentDraw, 0);
-		lcd.print("mA");
-		currentDrawOLD = currentDraw;
-		tickTock = 1;
+		currentDraw = applyCalCurrent(readCurrent());
+		if (currentDraw != currentDrawOLD) //update if value has changed
+		{
+			lcd.setCursor(0, 3);
+			lcd.print("I: ");
+			lcd.print("     ");
+			lcd.setCursor(3, 3);
+			lcd.print(currentDraw, 0);
+			lcd.print("mA");
+			currentDrawOLD = currentDraw;
+			tickTock = 1;
+		}
 	}
 
 	//vDisp = readVoltage();
-	vDisp = applyCalVoltage(readVoltage()); // get voltage and use our calibration
-	if (vDisp != VinOLD && tickTock == 1)   //update if changed
+	if (tickTock == 1)
 	{
-		lcd.setCursor(11, 3);
-		lcd.print("V: ");
-		lcd.print("     ");
-		lcd.setCursor(14, 3);
-		lcd.print(vDisp, 2);
-		VinOLD = vDisp;
-		tickTock = 0;
+		vDisp = applyCalVoltage(readVoltage()); // get voltage and use our calibration
+		if (vDisp != VinOLD)					//update if changed
+		{
+			lcd.setCursor(11, 3);
+			lcd.print("V: ");
+			lcd.print("     ");
+			lcd.setCursor(14, 3);
+			lcd.print(vDisp, 2);
+			VinOLD = vDisp;
+			tickTock = 0;
+		}
 	}
 	if (fourWireMode == true && fourWireMode != fourWireModeOld)
 	{
@@ -480,7 +577,7 @@ float readCurrent()
 	/* 	lcd.setCursor(0, 0);
 	lcd.print(currentG); */
 
-	adc = samples(1);		   // get avg ADC value from channel 2-3
+	adc = samples(1);			   // get avg ADC value from channel 2-3
 	volt = voltage(adc, currentG); // convert ADC value to a voltage reading based on the gain
 	volt = volt * 10000;
 	return volt;
@@ -514,7 +611,7 @@ float readVoltage()
 	/* 	lcd.setCursor(2, 0);
 	lcd.print(voltageG); */
 
-	adc = samples(23);		   // get avg ADC value from channel 2-3
+	adc = samples(23);			   // get avg ADC value from channel 2-3
 	volt = voltage(adc, voltageG); // convert ADC value to a voltage reading based on the gain
 	volt = volt * 26.4;
 	return volt;
