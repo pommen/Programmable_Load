@@ -1,40 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:device
-LIBS:switches
-LIBS:relays
-LIBS:motors
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
-LIBS:Peters
-LIBS:BLUEPILL
+EESchema Schematic File Version 4
 LIBS:v2-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -53,7 +19,7 @@ SCL
 Text GLabel 5250 2700 3    60   Input ~ 0
 SDA
 $Comp
-L R_Small R28
+L device:R_Small R28
 U 1 1 5ADB7193
 P 5250 2600
 F 0 "R28" H 5280 2620 50  0000 L CNN
@@ -64,7 +30,7 @@ F 3 "" H 5250 2600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R_Small R29
+L device:R_Small R29
 U 1 1 5ADB719A
 P 5500 2600
 F 0 "R29" H 5530 2620 50  0000 L CNN
@@ -75,7 +41,7 @@ F 3 "" H 5500 2600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR087
+L power:+3.3V #PWR087
 U 1 1 5ADB71A1
 P 5250 2450
 F 0 "#PWR087" H 5250 2300 50  0001 C CNN
@@ -86,7 +52,7 @@ F 3 "" H 5250 2450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR088
+L power:+3.3V #PWR088
 U 1 1 5ADB71A7
 P 5500 2450
 F 0 "#PWR088" H 5500 2300 50  0001 C CNN
@@ -97,7 +63,7 @@ F 3 "" H 5500 2450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR089
+L power:GND #PWR089
 U 1 1 5ADB71AD
 P 1800 3050
 F 0 "#PWR089" H 1800 2800 50  0001 C CNN
@@ -120,7 +86,7 @@ encA
 Text GLabel 4300 1750 2    60   Input ~ 0
 OverTemp
 $Comp
-L GND #PWR090
+L power:GND #PWR090
 U 1 1 5ADB71BF
 P 5200 1650
 F 0 "#PWR090" H 5200 1400 50  0001 C CNN
@@ -149,7 +115,7 @@ Wire Wire Line
 Text GLabel 4200 1850 2    60   Input ~ 0
 LoadBlockTemp
 $Comp
-L Bluepill U15
+L Peters:Bluepill U15
 U 1 1 5ADB71CF
 P 2950 1800
 F 0 "U15" H 3300 2650 60  0000 C CNN
@@ -160,7 +126,7 @@ F 3 "http://wiki.stm32duino.com/index.php?title=STM32F103_boards" H 3000 2900 60
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x02 J11
+L conn:Conn_01x02 J11
 U 1 1 5ADB71D6
 P 5400 1550
 F 0 "J11" H 5400 1650 50  0000 C CNN
@@ -171,7 +137,7 @@ F 3 "" H 5400 1550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR091
+L power:GND #PWR091
 U 1 1 5ADB71DD
 P 4200 1250
 F 0 "#PWR091" H 4200 1000 50  0001 C CNN
@@ -182,7 +148,7 @@ F 3 "" H 4200 1250 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR092
+L power:GND #PWR092
 U 1 1 5ADB71E3
 P 4200 1350
 F 0 "#PWR092" H 4200 1100 50  0001 C CNN
@@ -197,7 +163,7 @@ Wire Wire Line
 Wire Wire Line
 	4600 1450 4600 1400
 $Comp
-L +3.3V #PWR093
+L power:+3.3V #PWR093
 U 1 1 5ADB71EB
 P 4600 1400
 F 0 "#PWR093" H 4600 1250 50  0001 C CNN
@@ -212,7 +178,7 @@ Wire Wire Line
 Wire Wire Line
 	4950 2450 4950 2400
 $Comp
-L GND #PWR094
+L power:GND #PWR094
 U 1 1 5ADB71F3
 P 4950 2800
 F 0 "#PWR094" H 4950 2550 50  0001 C CNN
@@ -223,7 +189,7 @@ F 3 "" H 4950 2800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C23
+L device:C C23
 U 1 1 5ADB71F9
 P 4950 2600
 F 0 "C23" H 4975 2700 50  0000 L CNN
@@ -234,7 +200,7 @@ F 3 "" H 4950 2600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR095
+L power:+3.3V #PWR095
 U 1 1 5ADB7200
 P 4950 2400
 F 0 "#PWR095" H 4950 2250 50  0001 C CNN
@@ -249,7 +215,7 @@ Wire Wire Line
 Wire Wire Line
 	4700 2450 4700 2400
 $Comp
-L GND #PWR096
+L power:GND #PWR096
 U 1 1 5ADB7208
 P 4700 2800
 F 0 "#PWR096" H 4700 2550 50  0001 C CNN
@@ -260,7 +226,7 @@ F 3 "" H 4700 2800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C22
+L device:C C22
 U 1 1 5ADB720E
 P 4700 2600
 F 0 "C22" H 4725 2700 50  0000 L CNN
@@ -271,7 +237,7 @@ F 3 "" H 4700 2600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR097
+L power:+3.3V #PWR097
 U 1 1 5ADB7215
 P 4700 2400
 F 0 "#PWR097" H 4700 2250 50  0001 C CNN
@@ -282,7 +248,7 @@ F 3 "" H 4700 2400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR098
+L power:+3.3V #PWR098
 U 1 1 5ADB721B
 P 1500 3150
 F 0 "#PWR098" H 1500 3000 50  0001 C CNN
@@ -307,7 +273,7 @@ SS
 Text GLabel 4200 1950 2    60   Input ~ 0
 fan_PWM
 $Comp
-L Conn_01x02 J10
+L conn:Conn_01x02 J10
 U 1 1 5ADB7229
 P 4400 2650
 F 0 "J10" H 4400 2750 50  0000 C CNN
@@ -318,7 +284,7 @@ F 3 "" H 4400 2650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L PC817 U18
+L opto:PC817 U18
 U 1 1 5ADB8458
 P 9300 1350
 F 0 "U18" H 9100 1550 50  0000 L CNN
@@ -329,7 +295,7 @@ F 3 "" H 9300 1350 50  0001 L CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L 1N4148 D4
+L Peters:1N4148 D4
 U 1 1 5ADB845F
 P 9500 1400
 F 0 "D4" H 9450 1100 60  0000 C CNN
@@ -340,7 +306,7 @@ F 3 "https://www.vishay.com/docs/81857/1n4148.pdf" H 9450 1100 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L R R31
+L device:R R31
 U 1 1 5ADB8466
 P 10250 1450
 F 0 "R31" V 10330 1450 50  0000 C CNN
@@ -351,7 +317,7 @@ F 3 "" H 10250 1450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x02 J14
+L conn:Conn_01x02 J14
 U 1 1 5ADB846D
 P 10150 2050
 F 0 "J14" H 10150 2150 50  0000 C CNN
@@ -362,7 +328,7 @@ F 3 "" H 10150 2050 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R30
+L device:R R30
 U 1 1 5ADB8474
 P 9000 1800
 F 0 "R30" V 9080 1800 50  0000 C CNN
@@ -373,7 +339,7 @@ F 3 "" H 9000 1800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR099
+L power:GND #PWR099
 U 1 1 5ADB847B
 P 9000 2100
 F 0 "#PWR099" H 9000 1850 50  0001 C CNN
@@ -386,7 +352,7 @@ $EndComp
 Text GLabel 7850 1200 0    60   Input ~ 0
 trig
 $Comp
-L Conn_01x02 J12
+L conn:Conn_01x02 J12
 U 1 1 5ADB8482
 P 6300 1600
 F 0 "J12" H 6300 1700 50  0000 C CNN
@@ -397,7 +363,7 @@ F 3 "" H 6300 1600 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Conn_01x02 J13
+L conn:Conn_01x02 J13
 U 1 1 5ADB8489
 P 8450 1100
 F 0 "J13" H 8450 1200 50  0000 C CNN
@@ -408,7 +374,7 @@ F 3 "" H 8450 1100 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L GND #PWR0100
+L power:GND #PWR0100
 U 1 1 5ADB8490
 P 8350 1950
 F 0 "#PWR0100" H 8350 1700 50  0001 C CNN
@@ -419,7 +385,7 @@ F 3 "" H 8350 1950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0101
+L power:GND #PWR0101
 U 1 1 5ADB8496
 P 7400 1700
 F 0 "#PWR0101" H 7400 1450 50  0001 C CNN
@@ -430,7 +396,7 @@ F 3 "" H 7400 1700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR0102
+L power:+3.3V #PWR0102
 U 1 1 5ADB849C
 P 7400 1300
 F 0 "#PWR0102" H 7400 1150 50  0001 C CNN
@@ -441,7 +407,7 @@ F 3 "" H 7400 1300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR0103
+L power:+3.3V #PWR0103
 U 1 1 5ADB84A2
 P 8350 1550
 F 0 "#PWR0103" H 8350 1400 50  0001 C CNN
@@ -452,7 +418,7 @@ F 3 "" H 8350 1550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR0104
+L power:+3.3V #PWR0104
 U 1 1 5ADB84A8
 P 8650 1000
 F 0 "#PWR0104" H 8650 850 50  0001 C CNN
@@ -463,7 +429,7 @@ F 3 "" H 8650 1000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR0105
+L power:+3.3V #PWR0105
 U 1 1 5ADB84AE
 P 8950 1150
 F 0 "#PWR0105" H 8950 1000 50  0001 C CNN
@@ -534,7 +500,7 @@ Wire Wire Line
 Wire Wire Line
 	9950 1600 9650 1600
 $Comp
-L SN74LVC2G14 U16
+L Peters:SN74LVC2G14 U16
 U 1 1 5ADB84D4
 P 7400 1550
 F 0 "U16" H 7100 1450 60  0000 C CNN
@@ -545,7 +511,7 @@ F 3 "http://www.ti.com/lit/ds/symlink/sn74lvc1g14.pdf" H 7400 2150 60  0001 C CN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L SN74LVC2G14 U16
+L Peters:SN74LVC2G14 U16
 U 2 1 5ADB84DB
 P 8350 1800
 F 0 "U16" H 8000 1700 60  0000 C CNN
@@ -558,7 +524,7 @@ $EndComp
 Text Notes 10000 950  0    60   ~ 0
 Trigger
 $Comp
-L Battery_Cell BT1
+L device:Battery_Cell BT1
 U 1 1 5ADB8A71
 P 2750 4400
 F 0 "BT1" H 2850 4500 50  0000 L CNN
@@ -569,7 +535,7 @@ F 3 "" V 2750 4460 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0106
+L power:GND #PWR0106
 U 1 1 5ADB8A78
 P 2750 4550
 F 0 "#PWR0106" H 2750 4300 50  0001 C CNN
@@ -580,7 +546,7 @@ F 3 "" H 2750 4550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DS3231 U14
+L Peters:DS3231 U14
 U 1 1 5ADB8A7E
 P 2200 4600
 F 0 "U14" H 2050 5400 60  0000 C CNN
@@ -595,7 +561,7 @@ SCL
 Text GLabel 2550 4100 2    60   Input ~ 0
 SDA
 $Comp
-L +3.3V #PWR0107
+L power:+3.3V #PWR0107
 U 1 1 5ADB8A87
 P 1350 4100
 F 0 "#PWR0107" H 1350 3950 50  0001 C CNN
@@ -606,7 +572,7 @@ F 3 "" H 1350 4100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C21
+L device:C C21
 U 1 1 5ADB8A8D
 P 1350 4250
 F 0 "C21" H 1375 4350 50  0000 L CNN
@@ -617,7 +583,7 @@ F 3 "" H 1350 4250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0108
+L power:GND #PWR0108
 U 1 1 5ADB8A94
 P 1350 4450
 F 0 "#PWR0108" H 1350 4200 50  0001 C CNN
@@ -640,7 +606,7 @@ Wire Wire Line
 Wire Wire Line
 	2750 4200 2550 4200
 $Comp
-L Conn_01x02 J9
+L conn:Conn_01x02 J9
 U 1 1 5ADC9E0D
 P 950 2850
 F 0 "J9" H 950 2950 50  0000 C CNN
@@ -651,7 +617,7 @@ F 3 "" H 950 2850 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L GND #PWR0109
+L power:GND #PWR0109
 U 1 1 5ADC9FA5
 P 1150 3000
 F 0 "#PWR0109" H 1150 2750 50  0001 C CNN

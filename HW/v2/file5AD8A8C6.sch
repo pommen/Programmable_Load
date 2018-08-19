@@ -1,40 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:device
-LIBS:switches
-LIBS:relays
-LIBS:motors
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
-LIBS:Peters
-LIBS:BLUEPILL
+EESchema Schematic File Version 4
 LIBS:v2-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -49,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Earth #PWR026
+L power:Earth #PWR026
 U 1 1 5ADA6D6A
 P 1550 2300
 F 0 "#PWR026" H 1550 2050 50  0001 C CNN
@@ -60,7 +26,7 @@ F 3 "" H 1550 2300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L STW45NM50 Q4
+L Peters:STW45NM50 Q4
 U 1 1 5ADA6D6B
 P 3700 4700
 F 0 "Q4" H 3900 4775 50  0000 L CNN
@@ -71,7 +37,7 @@ F 3 "" H 3700 4700 50  0001 L CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R13
+L device:R R13
 U 1 1 5ADA6D6C
 P 3350 5050
 F 0 "R13" V 3430 5050 50  0000 C CNN
@@ -82,7 +48,7 @@ F 3 "" H 3350 5050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR027
+L power:Earth #PWR027
 U 1 1 5ADA6D6D
 P 3350 5250
 F 0 "#PWR027" H 3350 5000 50  0001 C CNN
@@ -93,7 +59,7 @@ F 3 "" H 3350 5250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR028
+L power:+12V #PWR028
 U 1 1 5ADA6D6E
 P 2300 4450
 F 0 "#PWR028" H 2300 4300 50  0001 C CNN
@@ -104,7 +70,7 @@ F 3 "" H 2300 4450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C11
+L device:C C11
 U 1 1 5ADA6D6F
 P 2850 4950
 F 0 "C11" H 2875 5050 50  0000 L CNN
@@ -115,7 +81,7 @@ F 3 "" H 2850 4950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R8
+L device:R R8
 U 1 1 5ADA6D70
 P 2850 5250
 F 0 "R8" V 2930 5250 50  0000 C CNN
@@ -126,7 +92,7 @@ F 3 "" H 2850 5250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C9
+L device:C C9
 U 1 1 5ADA6D71
 P 2450 5950
 F 0 "C9" H 2475 6050 50  0000 L CNN
@@ -137,7 +103,7 @@ F 3 "" H 2450 5950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C20
+L device:C C20
 U 1 1 5ADA6D72
 P 9900 2050
 F 0 "C20" H 9925 2150 50  0000 L CNN
@@ -148,7 +114,7 @@ F 3 "" H 9900 2050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR029
+L power:+5V #PWR029
 U 1 1 5ADA6D73
 P 9900 1900
 F 0 "#PWR029" H 9900 1750 50  0001 C CNN
@@ -159,7 +125,7 @@ F 3 "" H 9900 1900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR030
+L power:Earth #PWR030
 U 1 1 5ADA6D74
 P 2450 6100
 F 0 "#PWR030" H 2450 5850 50  0001 C CNN
@@ -170,7 +136,7 @@ F 3 "" H 2450 6100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR031
+L power:Earth #PWR031
 U 1 1 5ADA6D75
 P 9900 2200
 F 0 "#PWR031" H 9900 1950 50  0001 C CNN
@@ -181,7 +147,7 @@ F 3 "" H 9900 2200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1 C12
+L device:CP1 C12
 U 1 1 5ADA6D76
 P 2950 5950
 F 0 "C12" H 2975 6050 50  0000 L CNN
@@ -192,7 +158,7 @@ F 3 "" H 2950 5950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR032
+L power:Earth #PWR032
 U 1 1 5ADA6D77
 P 2950 6100
 F 0 "#PWR032" H 2950 5850 50  0001 C CNN
@@ -214,7 +180,7 @@ F 3 "" H 1450 4550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L ADS1115 U3
+L Peters:ADS1115 U3
 U 1 1 5ADA6D79
 P 1550 2000
 F 0 "U3" H 1800 2950 60  0000 C CNN
@@ -225,7 +191,7 @@ F 3 "" H 1550 2000 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR033
+L power:+5V #PWR033
 U 1 1 5ADA6D7A
 P 1550 1450
 F 0 "#PWR033" H 1550 1300 50  0001 C CNN
@@ -236,7 +202,7 @@ F 3 "" H 1550 1450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR034
+L power:Earth #PWR034
 U 1 1 5ADA6D7B
 P 3800 5950
 F 0 "#PWR034" H 3800 5700 50  0001 C CNN
@@ -247,7 +213,7 @@ F 3 "" H 3800 5950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR035
+L power:Earth #PWR035
 U 1 1 5ADA6D7C
 P 2450 1800
 F 0 "#PWR035" H 2450 1550 50  0001 C CNN
@@ -258,7 +224,7 @@ F 3 "" H 2450 1800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR036
+L power:Earth #PWR036
 U 1 1 5ADA6D7D
 P 2300 2500
 F 0 "#PWR036" H 2300 2250 50  0001 C CNN
@@ -269,7 +235,7 @@ F 3 "" H 2300 2500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R14
+L device:R R14
 U 1 1 5ADA6D7E
 P 3950 5450
 F 0 "R14" V 4030 5450 50  0000 C CNN
@@ -280,7 +246,7 @@ F 3 "" H 3950 5450 50  0001 C CNN
 	0    -1   1    0   
 $EndComp
 $Comp
-L Earth #PWR037
+L power:Earth #PWR037
 U 1 1 5ADA6D7F
 P 5750 6300
 F 0 "#PWR037" H 5750 6050 50  0001 C CNN
@@ -291,7 +257,7 @@ F 3 "" H 5750 6300 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L C C15
+L device:C C15
 U 1 1 5ADA6D80
 P 5750 6000
 F 0 "C15" H 5775 6100 50  0000 L CNN
@@ -306,7 +272,7 @@ Curr
 Text GLabel 2600 1650 2    60   Input ~ 0
 Curr
 $Comp
-L +5V #PWR038
+L power:+5V #PWR038
 U 1 1 5ADA6D81
 P 4700 5500
 F 0 "#PWR038" H 4700 5350 50  0001 C CNN
@@ -317,7 +283,7 @@ F 3 "" H 4700 5500 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L -5V #PWR61
+L power:-5V #PWR61
 U 1 1 5ADA6D82
 P 4700 6100
 F 0 "#PWR61" H 4700 6200 50  0001 C CNN
@@ -328,7 +294,7 @@ F 3 "" H 4700 6100 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L -5V #PWR76
+L power:-5V #PWR76
 U 1 1 5ADA6D83
 P 6000 6950
 F 0 "#PWR76" H 6000 7050 50  0001 C CNN
@@ -339,7 +305,7 @@ F 3 "" H 6000 6950 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L C C16
+L device:C C16
 U 1 1 5ADA6D84
 P 6000 6800
 F 0 "C16" H 6025 6900 50  0000 L CNN
@@ -350,7 +316,7 @@ F 3 "" H 6000 6800 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR039
+L power:Earth #PWR039
 U 1 1 5ADA6D85
 P 6000 6650
 F 0 "#PWR039" H 6000 6400 50  0001 C CNN
@@ -361,7 +327,7 @@ F 3 "" H 6000 6650 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L R R15
+L device:R R15
 U 1 1 5ADA6D86
 P 4650 2050
 F 0 "R15" V 4730 2050 50  0000 C CNN
@@ -372,7 +338,7 @@ F 3 "" H 4650 2050 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Earth #PWR040
+L power:Earth #PWR040
 U 1 1 5ADA6D87
 P 4650 2250
 F 0 "#PWR040" H 4650 2000 50  0001 C CNN
@@ -383,7 +349,7 @@ F 3 "" H 4650 2250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C10
+L device:C C10
 U 1 1 5ADA6D88
 P 2750 2300
 F 0 "C10" H 2775 2400 50  0000 L CNN
@@ -394,7 +360,7 @@ F 3 "" H 2750 2300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR041
+L power:Earth #PWR041
 U 1 1 5ADA6D89
 P 2750 2500
 F 0 "#PWR041" H 2750 2250 50  0001 C CNN
@@ -405,7 +371,7 @@ F 3 "" H 2750 2500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R7
+L device:R R7
 U 1 1 5ADA6D8B
 P 2400 1050
 F 0 "R7" V 2480 1050 50  0000 C CNN
@@ -416,7 +382,7 @@ F 3 "" H 2400 1050 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L R R9
+L device:R R9
 U 1 1 5ADA6D8C
 P 3050 1050
 F 0 "R9" V 3130 1050 50  0000 C CNN
@@ -427,7 +393,7 @@ F 3 "" H 3050 1050 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L -5V #PWR51
+L power:-5V #PWR51
 U 1 1 5ADA6D8D
 P 3500 750
 F 0 "#PWR51" H 3500 850 50  0001 C CNN
@@ -438,7 +404,7 @@ F 3 "" H 3500 750 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Earth #PWR042
+L power:Earth #PWR042
 U 1 1 5ADA6D90
 P 5000 4750
 F 0 "#PWR042" H 5000 4500 50  0001 C CNN
@@ -449,7 +415,7 @@ F 3 "" H 5000 4750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LM35 U13
+L Peters:LM35 U13
 U 1 1 5ADA6D91
 P 10750 1850
 F 0 "U13" H 10900 1950 60  0000 C CNN
@@ -460,7 +426,7 @@ F 3 "" H 10750 1850 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR043
+L power:Earth #PWR043
 U 1 1 5ADA6D92
 P 10650 2300
 F 0 "#PWR043" H 10650 2050 50  0001 C CNN
@@ -471,7 +437,7 @@ F 3 "" H 10650 2300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR044
+L power:+5V #PWR044
 U 1 1 5ADA6D93
 P 10650 1400
 F 0 "#PWR044" H 10650 1250 50  0001 C CNN
@@ -482,7 +448,7 @@ F 3 "" H 10650 1400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR045
+L power:+5V #PWR045
 U 1 1 5ADA6D95
 P 9450 1350
 F 0 "#PWR045" H 9450 1200 50  0001 C CNN
@@ -493,7 +459,7 @@ F 3 "" H 9450 1350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR046
+L power:Earth #PWR046
 U 1 1 5ADA6D96
 P 9450 2150
 F 0 "#PWR046" H 9450 1900 50  0001 C CNN
@@ -504,7 +470,7 @@ F 3 "" H 9450 2150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R25
+L device:R R25
 U 1 1 5ADA6D97
 P 9650 2750
 F 0 "R25" V 9730 2750 50  0000 C CNN
@@ -515,7 +481,7 @@ F 3 "" H 9650 2750 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Earth #PWR047
+L power:Earth #PWR047
 U 1 1 5ADA6D98
 P 9650 3000
 F 0 "#PWR047" H 9650 2750 50  0001 C CNN
@@ -526,7 +492,7 @@ F 3 "" H 9650 3000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R24
+L device:R R24
 U 1 1 5ADA6D99
 P 9450 2450
 F 0 "R24" V 9530 2450 50  0000 C CNN
@@ -539,7 +505,7 @@ $EndComp
 Text Notes 8500 1650 0    60   ~ 0
 150C = 4.5V
 $Comp
-L +5V #PWR048
+L power:+5V #PWR048
 U 1 1 5ADA6D9A
 P 5700 6700
 F 0 "#PWR048" H 5700 6550 50  0001 C CNN
@@ -550,7 +516,7 @@ F 3 "" H 5700 6700 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L C C14
+L device:C C14
 U 1 1 5ADA6D9B
 P 5700 6850
 F 0 "C14" H 5725 6950 50  0000 L CNN
@@ -561,7 +527,7 @@ F 3 "" H 5700 6850 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR049
+L power:Earth #PWR049
 U 1 1 5ADA6D9C
 P 5700 7000
 F 0 "#PWR049" H 5700 6750 50  0001 C CNN
@@ -572,7 +538,7 @@ F 3 "" H 5700 7000 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR050
+L power:+5V #PWR050
 U 1 1 5ADA6D9D
 P 1050 1050
 F 0 "#PWR050" H 1050 900 50  0001 C CNN
@@ -583,7 +549,7 @@ F 3 "" H 1050 1050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C6
+L device:C C6
 U 1 1 5ADA6D9E
 P 1050 1200
 F 0 "C6" H 1075 1300 50  0000 L CNN
@@ -594,7 +560,7 @@ F 3 "" H 1050 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR051
+L power:Earth #PWR051
 U 1 1 5ADA6D9F
 P 1050 1350
 F 0 "#PWR051" H 1050 1100 50  0001 C CNN
@@ -605,7 +571,7 @@ F 3 "" H 1050 1350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R-shunt1
+L device:R R-shunt1
 U 1 1 5ADA6DA0
 P 3800 5750
 F 0 "R-shunt1" V 3880 5750 50  0000 C CNN
@@ -616,7 +582,7 @@ F 3 "" H 3800 5750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR052
+L power:+12V #PWR052
 U 1 1 5ADA6DA1
 P 2950 5800
 F 0 "#PWR052" H 2950 5650 50  0001 C CNN
@@ -627,7 +593,7 @@ F 3 "" H 2950 5800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR053
+L power:+12V #PWR053
 U 1 1 5ADA6DA2
 P 2450 5800
 F 0 "#PWR053" H 2450 5650 50  0001 C CNN
@@ -644,7 +610,7 @@ SCL
 Text GLabel 8600 1800 0    60   Input ~ 0
 LoadBlockTemp
 $Comp
-L OP07 U4
+L linear:OP07 U4
 U 1 1 5ADA6DA3
 P 2400 4750
 F 0 "U4" H 2400 5050 50  0000 L CNN
@@ -655,7 +621,7 @@ F 3 "" H 2450 4900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L OP07 U7
+L linear:OP07 U7
 U 1 1 5ADA6DA4
 P 4800 5800
 F 0 "U7" H 4800 6100 50  0000 L CNN
@@ -666,7 +632,7 @@ F 3 "" H 4850 5950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Fuse F1
+L device:Fuse F1
 U 1 1 5ADA6DA5
 P 4800 4250
 F 0 "F1" V 4603 4250 50  0000 C CNN
@@ -677,7 +643,7 @@ F 3 "" H 4800 4250 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L -5V #PWR33
+L power:-5V #PWR33
 U 1 1 5ADA6DA6
 P 1450 5950
 F 0 "#PWR33" H 1450 6050 50  0001 C CNN
@@ -688,7 +654,7 @@ F 3 "" H 1450 5950 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L C C7
+L device:C C7
 U 1 1 5ADA6DA7
 P 1450 5800
 F 0 "C7" H 1475 5900 50  0000 L CNN
@@ -699,7 +665,7 @@ F 3 "" H 1450 5800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR054
+L power:Earth #PWR054
 U 1 1 5ADA6DA8
 P 1450 5650
 F 0 "#PWR054" H 1450 5400 50  0001 C CNN
@@ -710,7 +676,7 @@ F 3 "" H 1450 5650 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L +5V #PWR055
+L power:+5V #PWR055
 U 1 1 5ADA6DA9
 P 3450 1350
 F 0 "#PWR055" H 3450 1200 50  0001 C CNN
@@ -721,7 +687,7 @@ F 3 "" H 3450 1350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C13
+L device:C C13
 U 1 1 5ADA6DAA
 P 3450 1500
 F 0 "C13" H 3475 1600 50  0000 L CNN
@@ -732,7 +698,7 @@ F 3 "" H 3450 1500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR056
+L power:Earth #PWR056
 U 1 1 5ADA6DAB
 P 3450 1650
 F 0 "#PWR056" H 3450 1400 50  0001 C CNN
@@ -748,6 +714,8 @@ $Comp
 L POT_TRIM RV2
 U 1 1 5ADA6DAC
 P 2450 5200
+AR Path="/5ADA6DAC" Ref="RV2"  Part="1" 
+AR Path="/5AD8A8C6/5ADA6DAC" Ref="RV2"  Part="1" 
 F 0 "RV2" V 2450 5200 50  0000 C CNN
 F 1 "POT_TRIM" V 2650 5200 50  0000 C CNN
 F 2 "Potentiometers:Potentiometer_Trimmer_ACP_CA9h2.5_Vertical_Px2.5mm_Py5.0mm" H 2450 5200 50  0001 C CNN
@@ -760,7 +728,7 @@ comperator
 Text Notes 2550 3900 0    60   ~ 0
 14 bits = 4096 steps\n1 step=1mV\n1mV@0.1 Ohm = 10mA 
 $Comp
-L OP07 U8
+L linear:OP07 U8
 U 1 1 5ADA6DAD
 P 5150 1900
 F 0 "U8" H 5200 2150 50  0000 L CNN
@@ -771,7 +739,7 @@ F 3 "" H 5200 2050 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L R R21
+L device:R R21
 U 1 1 5ADA6DAE
 P 6100 1800
 F 0 "R21" V 6180 1800 50  0000 C CNN
@@ -782,7 +750,7 @@ F 3 "" H 6100 1800 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R22
+L device:R R22
 U 1 1 5ADA6DAF
 P 6100 2000
 F 0 "R22" V 6180 2000 50  0000 C CNN
@@ -793,7 +761,7 @@ F 3 "" H 6100 2000 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R16
+L device:R R16
 U 1 1 5ADA6DB0
 P 5100 1100
 F 0 "R16" V 5000 1100 50  0000 C CNN
@@ -804,7 +772,7 @@ F 3 "" H 5100 1100 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R18
+L device:R R18
 U 1 1 5ADA6DB1
 P 5550 2150
 F 0 "R18" V 5630 2150 50  0000 C CNN
@@ -815,7 +783,7 @@ F 3 "" H 5550 2150 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Earth #PWR057
+L power:Earth #PWR057
 U 1 1 5ADA6DB2
 P 6500 950
 F 0 "#PWR057" H 6500 700 50  0001 C CNN
@@ -826,7 +794,7 @@ F 3 "" H 6500 950 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L C C18
+L device:C C18
 U 1 1 5ADA6DB3
 P 6500 1100
 F 0 "C18" H 6525 1200 50  0000 L CNN
@@ -837,7 +805,7 @@ F 3 "" H 6500 1100 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Earth #PWR058
+L power:Earth #PWR058
 U 1 1 5ADA6DB4
 P 4900 2750
 F 0 "#PWR058" H 4900 2500 50  0001 C CNN
@@ -848,7 +816,7 @@ F 3 "" H 4900 2750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L -5V #PWR67
+L power:-5V #PWR67
 U 1 1 5ADA6DB5
 P 5250 2250
 F 0 "#PWR67" H 5250 2350 50  0001 C CNN
@@ -859,7 +827,7 @@ F 3 "" H 5250 2250 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L +5V #PWR059
+L power:+5V #PWR059
 U 1 1 5ADA6DB6
 P 5250 1500
 F 0 "#PWR059" H 5250 1350 50  0001 C CNN
@@ -870,7 +838,7 @@ F 3 "" H 5250 1500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR060
+L power:Earth #PWR060
 U 1 1 5ADA6DB7
 P 6200 1250
 F 0 "#PWR060" H 6200 1000 50  0001 C CNN
@@ -881,7 +849,7 @@ F 3 "" H 6200 1250 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L C C17
+L device:C C17
 U 1 1 5ADA6DB8
 P 6200 1100
 F 0 "C17" H 6225 1200 50  0000 L CNN
@@ -892,7 +860,7 @@ F 3 "" H 6200 1100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR061
+L power:+5V #PWR061
 U 1 1 5ADA6DB9
 P 6200 950
 F 0 "#PWR061" H 6200 800 50  0001 C CNN
@@ -903,7 +871,7 @@ F 3 "" H 6200 950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L -5V #PWR80
+L power:-5V #PWR80
 U 1 1 5ADA6DBA
 P 6500 1350
 F 0 "#PWR80" H 6500 1450 50  0001 C CNN
@@ -916,14 +884,14 @@ $EndComp
 Text Notes 1500 2900 0    60   ~ 0
 Remote sense\nGår via en 2x2 pols brytare på fronten.\nAntingen mäter den via banankontakter eller rätt på utgången
 Wire Wire Line
-	2700 4750 2950 4750
+	2700 4750 2850 4750
 Wire Wire Line
-	3250 4750 3500 4750
+	3250 4750 3350 4750
 Connection ~ 3350 4750
 Wire Wire Line
 	3350 5250 3350 5200
 Wire Wire Line
-	3800 4900 3800 5600
+	3800 4900 3800 5450
 Wire Wire Line
 	2000 1800 2450 1800
 Wire Wire Line
@@ -933,7 +901,7 @@ Wire Wire Line
 Wire Wire Line
 	4150 5700 4500 5700
 Wire Wire Line
-	5600 5800 5950 5800
+	5600 5800 5750 5800
 Wire Wire Line
 	5750 5800 5750 5850
 Connection ~ 5750 5800
@@ -942,14 +910,14 @@ Wire Wire Line
 Wire Wire Line
 	4650 2250 4650 2200
 Wire Wire Line
-	2000 1950 3150 1950
+	2000 1950 2750 1950
 Wire Wire Line
 	2750 2150 2750 1950
 Connection ~ 2750 1950
 Wire Wire Line
 	2750 2500 2750 2450
 Wire Wire Line
-	2000 1650 2600 1650
+	2000 1650 2400 1650
 Wire Wire Line
 	2400 1200 2400 1650
 Connection ~ 2400 1650
@@ -959,7 +927,7 @@ Connection ~ 3050 1950
 Wire Wire Line
 	2400 900  2400 650 
 Wire Wire Line
-	2400 650  3500 650 
+	2400 650  3050 650 
 Wire Wire Line
 	3500 650  3500 750 
 Wire Wire Line
@@ -976,11 +944,11 @@ Wire Wire Line
 Wire Wire Line
 	9450 2150 9450 2100
 Wire Wire Line
-	9650 1900 9650 2600
+	9650 1900 9650 2450
 Wire Wire Line
 	8950 2450 8950 1800
 Wire Wire Line
-	8600 1800 9050 1800
+	8600 1800 8950 1800
 Connection ~ 8950 1800
 Wire Wire Line
 	10350 1900 10350 1700
@@ -993,8 +961,6 @@ Wire Wire Line
 Connection ~ 9650 2450
 Wire Wire Line
 	9650 3000 9650 2900
-Wire Wire Line
-	2850 5100 2850 5100
 Wire Wire Line
 	2850 4750 2850 4800
 Connection ~ 2850 4750
@@ -1011,12 +977,12 @@ Connection ~ 4300 4250
 Wire Wire Line
 	4950 4250 5050 4250
 Wire Wire Line
-	1400 4650 2100 4650
+	1400 4650 1450 4650
 Wire Wire Line
 	1450 4650 1450 4550
 Connection ~ 1450 4650
 Wire Wire Line
-	1600 4850 1600 5450
+	1600 4850 1600 5250
 Connection ~ 3800 5450
 Wire Wire Line
 	4150 5700 4150 5450
@@ -1044,9 +1010,9 @@ Wire Wire Line
 Wire Wire Line
 	2300 2100 2300 2500
 Wire Wire Line
-	5450 1800 5950 1800
+	5450 1800 5550 1800
 Wire Wire Line
-	5450 2000 5950 2000
+	5450 2000 5550 2000
 Connection ~ 5550 2000
 Wire Wire Line
 	6500 1250 6500 1350
@@ -1061,7 +1027,7 @@ Wire Wire Line
 	6500 2000 6250 2000
 Connection ~ 4650 1900
 $Comp
-L R R11
+L device:R R11
 U 1 1 5ADA6DBD
 P 3300 1950
 F 0 "R11" V 3380 1950 50  0000 C CNN
@@ -1074,7 +1040,7 @@ $EndComp
 Text Notes 2550 1150 1    60   ~ 0
 nc?
 $Comp
-L +5V #PWR062
+L power:+5V #PWR062
 U 1 1 5ADA6DBE
 P 650 1050
 F 0 "#PWR062" H 650 900 50  0001 C CNN
@@ -1085,7 +1051,7 @@ F 3 "" H 650 1050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C C5
+L device:C C5
 U 1 1 5ADA6DBF
 P 650 1200
 F 0 "C5" H 675 1300 50  0000 L CNN
@@ -1096,7 +1062,7 @@ F 3 "" H 650 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR063
+L power:Earth #PWR063
 U 1 1 5ADA6DC0
 P 650 1350
 F 0 "#PWR063" H 650 1100 50  0001 C CNN
@@ -1107,7 +1073,7 @@ F 3 "" H 650 1350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR064
+L power:Earth #PWR064
 U 1 1 5ADA6DC1
 P 7800 2700
 F 0 "#PWR064" H 7800 2450 50  0001 C CNN
@@ -1118,7 +1084,7 @@ F 3 "" H 7800 2700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR065
+L power:GND #PWR065
 U 1 1 5ADA6DC2
 P 8000 2700
 F 0 "#PWR065" H 8000 2450 50  0001 C CNN
@@ -1138,6 +1104,8 @@ $Comp
 L POT_TRIM RV1
 U 1 1 5ADA6DC3
 P 700 5250
+AR Path="/5ADA6DC3" Ref="RV1"  Part="1" 
+AR Path="/5AD8A8C6/5ADA6DC3" Ref="RV1"  Part="1" 
 F 0 "RV1" V 800 5050 50  0000 C CNN
 F 1 "Null cal" H 750 5500 50  0000 C CNN
 F 2 "Potentiometers:Potentiometer_Trimmer_ACP_CA9h2.5_Vertical_Px2.5mm_Py5.0mm" H 700 5250 50  0001 C CNN
@@ -1148,7 +1116,7 @@ $EndComp
 Text GLabel 700  5000 1    60   Input ~ 0
 4.096V
 $Comp
-L Earth #PWR066
+L power:Earth #PWR066
 U 1 1 5ADA6DC4
 P 1050 6600
 F 0 "#PWR066" H 1050 6350 50  0001 C CNN
@@ -1159,7 +1127,7 @@ F 3 "" H 1050 6600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L TL431A U2
+L Peters:TL431A U2
 U 1 1 5ADA6DC5
 P 1050 6300
 F 0 "U2" H 900 6450 60  0000 C CNN
@@ -1176,7 +1144,7 @@ Wire Wire Line
 Wire Wire Line
 	1050 6550 1050 6600
 $Comp
-L R R5
+L device:R R5
 U 1 1 5ADA6DC6
 P 1050 5800
 F 0 "R5" V 1130 5800 50  0000 C CNN
@@ -1189,7 +1157,7 @@ $EndComp
 Wire Wire Line
 	1050 6000 1050 5950
 $Comp
-L -5V #PWR30
+L power:-5V #PWR30
 U 1 1 5ADA6DC7
 P 1050 5550
 F 0 "#PWR30" H 1050 5650 50  0001 C CNN
@@ -1206,7 +1174,7 @@ Wire Wire Line
 Wire Wire Line
 	850  5250 1200 5250
 $Comp
-L R R6
+L device:R R6
 U 1 1 5ADA6DC8
 P 1350 5250
 F 0 "R6" V 1430 5250 50  0000 C CNN
@@ -1219,7 +1187,7 @@ $EndComp
 Wire Wire Line
 	1500 5250 1600 5250
 $Comp
-L Earth #PWR067
+L power:Earth #PWR067
 U 1 1 5ADA6DC9
 P 4300 4600
 F 0 "#PWR067" H 4300 4350 50  0001 C CNN
@@ -1230,7 +1198,7 @@ F 3 "" H 4300 4600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L D_Schottky D3
+L device:D_Schottky D3
 U 1 1 5ADA6DCA
 P 4300 4450
 F 0 "D3" H 4300 4550 50  0000 C CNN
@@ -1245,7 +1213,7 @@ Dut+
 Text Label 5000 4250 0    60   ~ 0
 Dut+_efter_säkring
 $Comp
-L Conn_01x02 J8
+L conn:Conn_01x02 J8
 U 1 1 5ADA6DCB
 P 6700 1850
 F 0 "J8" H 6700 1950 50  0000 C CNN
@@ -1262,7 +1230,7 @@ Wire Wire Line
 Wire Wire Line
 	700  5000 700  5100
 $Comp
-L R R19
+L device:R R19
 U 1 1 5ADA6DCC
 P 5800 1650
 F 0 "R19" V 5880 1650 50  0000 C CNN
@@ -1273,7 +1241,7 @@ F 3 "" H 5800 1650 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L R R20
+L device:R R20
 U 1 1 5ADA6DCD
 P 5850 2150
 F 0 "R20" V 5930 2150 50  0000 C CNN
@@ -1284,7 +1252,7 @@ F 3 "" H 5850 2150 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Earth #PWR068
+L power:Earth #PWR068
 U 1 1 5ADA6DCE
 P 6000 1500
 F 0 "#PWR068" H 6000 1250 50  0001 C CNN
@@ -1297,9 +1265,9 @@ $EndComp
 Wire Wire Line
 	5800 1500 6000 1500
 Wire Wire Line
-	4200 1900 4850 1900
+	4200 1900 4650 1900
 $Comp
-L +5V #PWR069
+L power:+5V #PWR069
 U 1 1 5ADA6DCF
 P 4750 6400
 F 0 "#PWR069" H 4750 6250 50  0001 C CNN
@@ -1310,7 +1278,7 @@ F 3 "" H 4750 6400 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR070
+L power:+12V #PWR070
 U 1 1 5ADA6DD0
 P 2150 5350
 F 0 "#PWR070" H 2150 5200 50  0001 C CNN
@@ -1321,7 +1289,7 @@ F 3 "" H 2150 5350 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L R R10
+L device:R R10
 U 1 1 5ADA6DD1
 P 3100 4750
 F 0 "R10" V 3180 4750 50  0000 C CNN
@@ -1332,18 +1300,18 @@ F 3 "" H 3100 4750 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L LM321 U12
+L linear:LM321 U12
 U 1 1 5ADAE55C
 P 9350 1800
 F 0 "U12" H 9350 2100 50  0000 L CNN
-F 1 "Temp amp" H 9350 2000 50  0000 L CNN
+F 1 "Temp amp" H 8700 2150 50  0000 L CNN
 F 2 "TO_SOT_Packages_SMD:SOT-23-5" H 9350 1800 50  0001 C CNN
 F 3 "" H 9350 1800 50  0001 C CNN
 	1    9350 1800
-	-1   0    0    1   
+	-1   0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR071
+L power:Earth #PWR071
 U 1 1 5ADAEA7E
 P 5550 2300
 F 0 "#PWR071" H 5550 2050 50  0001 C CNN
@@ -1354,7 +1322,7 @@ F 3 "" H 5550 2300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR072
+L power:Earth #PWR072
 U 1 1 5ADAF38B
 P 5850 2300
 F 0 "#PWR072" H 5850 2050 50  0001 C CNN
@@ -1367,7 +1335,7 @@ $EndComp
 Connection ~ 5850 2000
 Connection ~ 5800 1800
 $Comp
-L Conn_01x01 J6
+L conn:Conn_01x01 J6
 U 1 1 5ADAFD20
 P 5250 4250
 F 0 "J6" H 5250 4350 50  0000 C CNN
@@ -1378,7 +1346,7 @@ F 3 "" H 5250 4250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Conn_01x01 J7
+L conn:Conn_01x01 J7
 U 1 1 5ADAFFD1
 P 5250 4550
 F 0 "J7" H 5250 4650 50  0000 C CNN
@@ -1389,7 +1357,7 @@ F 3 "" H 5250 4550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L MCP4725 U10
+L Peters:MCP4725 U10
 U 1 1 5ADB9286
 P 7750 4950
 F 0 "U10" H 7300 5250 50  0000 L CNN
@@ -1404,7 +1372,7 @@ SCL
 Text GLabel 7150 4950 0    60   Input ~ 0
 SDA
 $Comp
-L GND #PWR073
+L power:GND #PWR073
 U 1 1 5ADB928F
 P 7650 5400
 F 0 "#PWR073" H 7650 5150 50  0001 C CNN
@@ -1417,7 +1385,7 @@ $EndComp
 Text GLabel 10400 5050 2    60   Input ~ 0
 CurrentSet
 $Comp
-L C C19
+L device:C C19
 U 1 1 5ADB9296
 P 8450 4400
 F 0 "C19" H 8475 4500 50  0000 L CNN
@@ -1428,7 +1396,7 @@ F 3 "" H 8450 4400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR074
+L power:GND #PWR074
 U 1 1 5ADB929D
 P 8450 4550
 F 0 "#PWR074" H 8450 4300 50  0001 C CNN
@@ -1445,13 +1413,13 @@ Text GLabel 8450 4250 0    60   Input ~ 0
 Text Notes 6950 4300 0    60   ~ 0
 14 bits = 4096 steps\n1 step=1mV\n\nDivide to 0-1.1 V = 1100mv / 4095 = 0,2686 mv /step\n1mV@0.1 Ohm = 10mA \n40AMAX
 Wire Wire Line
-	8350 4950 8950 4950
+	8350 4950 8450 4950
 Wire Wire Line
 	7650 5400 7650 5350
 Wire Wire Line
 	7650 4550 7650 4500
 $Comp
-L AD8628 U11
+L Peters:AD8628 U11
 U 1 1 5ADB92A9
 P 9250 5050
 F 0 "U11" H 9250 5250 50  0000 L CNN
@@ -1462,7 +1430,7 @@ F 3 "http://www.analog.com/media/en/technical-documentation/data-sheets/AD8628_8
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R23
+L device:R R23
 U 1 1 5ADB92B0
 P 8450 5100
 F 0 "R23" V 8530 5100 50  0000 C CNN
@@ -1473,7 +1441,7 @@ F 3 "" H 8450 5100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR075
+L power:GND #PWR075
 U 1 1 5ADB92B7
 P 8450 5400
 F 0 "#PWR075" H 8450 5150 50  0001 C CNN
@@ -1487,7 +1455,7 @@ Wire Wire Line
 	8450 5400 8450 5250
 Connection ~ 8450 4950
 $Comp
-L GND #PWR076
+L power:GND #PWR076
 U 1 1 5ADB92BF
 P 9200 5350
 F 0 "#PWR076" H 9200 5100 50  0001 C CNN
@@ -1509,7 +1477,7 @@ Wire Wire Line
 	9650 5650 9650 5050
 Connection ~ 9650 5050
 $Comp
-L R R26
+L device:R R26
 U 1 1 5ADB92CB
 P 9900 5050
 F 0 "R26" V 9980 5050 50  0000 C CNN
@@ -1520,7 +1488,7 @@ F 3 "" H 9900 5050 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R27
+L device:R R27
 U 1 1 5ADB92D2
 P 10150 5200
 F 0 "R27" V 10230 5200 50  0000 C CNN
@@ -1534,6 +1502,8 @@ $Comp
 L POT_TRIM RV3
 U 1 1 5ADB92D9
 P 10150 5550
+AR Path="/5ADB92D9" Ref="RV3"  Part="1" 
+AR Path="/5AD8A8C6/5ADB92D9" Ref="RV3"  Part="1" 
 F 0 "RV3" V 9975 5550 50  0000 C CNN
 F 1 "5K" V 10050 5550 50  0000 C CNN
 F 2 "Potentiometers:Potentiometer_Trimmer_ACP_CA9h2.5_Vertical_Px2.5mm_Py5.0mm" H 10150 5550 50  0001 C CNN
@@ -1550,12 +1520,12 @@ Wire Wire Line
 Wire Wire Line
 	10150 5400 10150 5350
 Wire Wire Line
-	10050 5050 10400 5050
+	10050 5050 10150 5050
 Wire Wire Line
-	9550 5050 9750 5050
+	9550 5050 9650 5050
 Connection ~ 10150 5050
 $Comp
-L GND #PWR077
+L power:GND #PWR077
 U 1 1 5ADB92E7
 P 10150 5750
 F 0 "#PWR077" H 10150 5500 50  0001 C CNN
@@ -1566,7 +1536,7 @@ F 3 "" H 10150 5750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR078
+L power:GND #PWR078
 U 1 1 5ADB92ED
 P 7150 5150
 F 0 "#PWR078" H 7150 4900 50  0001 C CNN
@@ -1589,55 +1559,13 @@ Wire Notes Line
 Text Notes 9500 4850 0    60   ~ 0
 Cal to 1100mV@step 4095
 Wire Wire Line
-	3800 4250 4650 4250
+	3800 4250 4300 4250
 Wire Wire Line
 	3800 4250 3800 4500
 Wire Wire Line
 	700  6000 1050 6000
 $Comp
-L OP07 U5
-U 1 1 5AD920CC
-P 3900 2000
-F 0 "U5" H 3950 2250 50  0000 L CNN
-F 1 "Volt buffer" H 3950 2150 50  0000 L CNN
-F 2 "Housings_DIP:DIP-8_W7.62mm_Socket_LongPads" H 3950 2050 50  0001 C CNN
-F 3 "" H 3950 2150 50  0001 C CNN
-	1    3900 2000
-	-1   0    0    -1  
-$EndComp
-Wire Wire Line
-	4200 2100 4200 2500
-Wire Wire Line
-	4200 2500 3600 2500
-Wire Wire Line
-	3600 2500 3600 1950
-Wire Wire Line
-	3600 1950 3450 1950
-Connection ~ 3600 2000
-$Comp
-L Earth #PWR079
-U 1 1 5AD92516
-P 4000 2300
-F 0 "#PWR079" H 4000 2050 50  0001 C CNN
-F 1 "Earth" H 4000 2150 50  0001 C CNN
-F 2 "" H 4000 2300 50  0001 C CNN
-F 3 "" H 4000 2300 50  0001 C CNN
-	1    4000 2300
-	1    0    0    -1  
-$EndComp
-$Comp
-L +5V #PWR080
-U 1 1 5AD925D2
-P 4000 1700
-F 0 "#PWR080" H 4000 1550 50  0001 C CNN
-F 1 "+5V" H 4000 1840 50  0000 C CNN
-F 2 "" H 4000 1700 50  0001 C CNN
-F 3 "" H 4000 1700 50  0001 C CNN
-	1    4000 1700
-	1    0    0    -1  
-$EndComp
-$Comp
-L R R12
+L device:R R12
 U 1 1 5ADB3013
 P 3300 5450
 F 0 "R12" V 3380 5450 50  0000 C CNN
@@ -1650,9 +1578,9 @@ $EndComp
 Wire Wire Line
 	3800 5450 3450 5450
 Wire Wire Line
-	1600 5450 3150 5450
+	1600 5450 2850 5450
 $Comp
-L AD5245 U6
+L Peters:AD5245 U6
 U 1 1 5ADB64E9
 P 4500 6550
 F 0 "U6" H 4600 6300 60  0000 C CNN
@@ -1663,7 +1591,7 @@ F 3 "http://www.analog.com/media/en/technical-documentation/data-sheets/AD5245.p
 	1    0    0    -1  
 $EndComp
 $Comp
-L AD5245 U9
+L Peters:AD5245 U9
 U 1 1 5ADB65D9
 P 5150 2750
 F 0 "U9" H 5250 2500 60  0000 C CNN
@@ -1688,7 +1616,7 @@ Wire Wire Line
 Wire Wire Line
 	4750 6450 4750 6400
 $Comp
-L +5V #PWR081
+L power:+5V #PWR081
 U 1 1 5ADB81E1
 P 4500 6300
 F 0 "#PWR081" H 4500 6150 50  0001 C CNN
@@ -1699,7 +1627,7 @@ F 3 "" H 4500 6300 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR082
+L power:Earth #PWR082
 U 1 1 5ADB85F9
 P 4500 6850
 F 0 "#PWR082" H 4500 6600 50  0001 C CNN
@@ -1712,7 +1640,7 @@ $EndComp
 Wire Wire Line
 	4500 6850 4500 6800
 $Comp
-L Earth #PWR083
+L power:Earth #PWR083
 U 1 1 5ADB89B8
 P 4200 6700
 F 0 "#PWR083" H 4200 6450 50  0001 C CNN
@@ -1733,7 +1661,7 @@ Wire Wire Line
 Wire Wire Line
 	4650 1100 4650 1900
 $Comp
-L +5V #PWR084
+L power:+5V #PWR084
 U 1 1 5ADBC4D9
 P 5050 3050
 F 0 "#PWR084" H 5050 2900 50  0001 C CNN
@@ -1752,7 +1680,7 @@ Wire Wire Line
 Wire Wire Line
 	5250 2200 5250 2250
 $Comp
-L +5V #PWR085
+L power:+5V #PWR085
 U 1 1 5ADC1C7B
 P 5500 2700
 F 0 "#PWR085" H 5500 2550 50  0001 C CNN
@@ -1763,7 +1691,7 @@ F 3 "" H 5500 2700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R17
+L device:R R17
 U 1 1 5ADC32DA
 P 5450 5800
 F 0 "R17" V 5530 5800 50  0000 C CNN
@@ -1775,10 +1703,8 @@ F 3 "" H 5450 5800 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	5100 5800 5300 5800
-NoConn ~ 3900 2300
-NoConn ~ 3800 2300
 $Comp
-L -5V #PWR38
+L power:-5V #PWR38
 U 1 1 5ADCFA13
 P 2100 5050
 F 0 "#PWR38" H 2100 5150 50  0001 C CNN
@@ -1791,7 +1717,7 @@ $EndComp
 Wire Wire Line
 	2300 5050 2100 5050
 $Comp
-L -5V #PWR37
+L power:-5V #PWR37
 U 1 1 5ADD06BF
 P 2000 6000
 F 0 "#PWR37" H 2000 6100 50  0001 C CNN
@@ -1802,7 +1728,7 @@ F 3 "" H 2000 6000 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L C C8
+L device:C C8
 U 1 1 5ADD06C5
 P 2000 5850
 F 0 "C8" H 2025 5950 50  0000 L CNN
@@ -1813,7 +1739,7 @@ F 3 "" H 2000 5850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR086
+L power:Earth #PWR086
 U 1 1 5ADD06CB
 P 2000 5700
 F 0 "#PWR086" H 2000 5450 50  0001 C CNN
@@ -1828,7 +1754,7 @@ Wire Wire Line
 Wire Wire Line
 	5050 2500 5050 2200
 Wire Wire Line
-	5400 2750 5500 2750
+	5400 2750 5450 2750
 Wire Wire Line
 	5500 2750 5500 2700
 Wire Wire Line
@@ -1836,4 +1762,54 @@ Wire Wire Line
 Wire Wire Line
 	5450 2500 5450 2750
 Connection ~ 5450 2750
+Wire Wire Line
+	3350 4750 3500 4750
+Wire Wire Line
+	5750 5800 5950 5800
+Wire Wire Line
+	2750 1950 3050 1950
+Wire Wire Line
+	2400 1650 2600 1650
+Wire Wire Line
+	3050 1950 3150 1950
+Wire Wire Line
+	3050 650  3500 650 
+Wire Wire Line
+	8950 1800 9050 1800
+Wire Wire Line
+	9650 2450 9650 2600
+Wire Wire Line
+	2850 4750 2950 4750
+Wire Wire Line
+	1600 5250 1600 5450
+Wire Wire Line
+	4300 4250 4650 4250
+Wire Wire Line
+	1450 4650 2100 4650
+Wire Wire Line
+	3800 5450 3800 5600
+Wire Wire Line
+	2850 5450 3150 5450
+Wire Wire Line
+	5550 2000 5850 2000
+Wire Wire Line
+	5550 1800 5800 1800
+Wire Wire Line
+	4650 1900 4850 1900
+Wire Wire Line
+	5850 2000 5950 2000
+Wire Wire Line
+	5800 1800 5950 1800
+Wire Wire Line
+	8450 4950 8950 4950
+Wire Wire Line
+	9650 5050 9750 5050
+Wire Wire Line
+	10150 5050 10400 5050
+Wire Wire Line
+	5450 2750 5500 2750
+Wire Wire Line
+	4200 1950 4200 1900
+Wire Wire Line
+	3450 1950 4200 1950
 $EndSCHEMATC

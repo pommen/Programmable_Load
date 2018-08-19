@@ -1,40 +1,6 @@
-EESchema Schematic File Version 2
-LIBS:power
-LIBS:device
-LIBS:switches
-LIBS:relays
-LIBS:motors
-LIBS:transistors
-LIBS:conn
-LIBS:linear
-LIBS:regul
-LIBS:74xx
-LIBS:cmos4000
-LIBS:adc-dac
-LIBS:memory
-LIBS:xilinx
-LIBS:microcontrollers
-LIBS:dsp
-LIBS:microchip
-LIBS:analog_switches
-LIBS:motorola
-LIBS:texas
-LIBS:intel
-LIBS:audio
-LIBS:interface
-LIBS:digital-audio
-LIBS:philips
-LIBS:display
-LIBS:cypress
-LIBS:siliconi
-LIBS:opto
-LIBS:atmel
-LIBS:contrib
-LIBS:valves
-LIBS:Peters
-LIBS:BLUEPILL
+EESchema Schematic File Version 4
 LIBS:v2-cache
-EELAYER 25 0
+EELAYER 26 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -49,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L +3.3V #PWR0110
+L power:+3.3V #PWR0110
 U 1 1 5ADA7C90
 P 2100 2300
 F 0 "#PWR0110" H 2100 2150 50  0001 C CNN
@@ -60,7 +26,7 @@ F 3 "" H 2100 2300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR0111
+L power:+12V #PWR0111
 U 1 1 5ADA7C91
 P 5050 1450
 F 0 "#PWR0111" H 5050 1300 50  0001 C CNN
@@ -71,7 +37,7 @@ F 3 "" H 5050 1450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR0112
+L power:+5V #PWR0112
 U 1 1 5ADA7C92
 P 6400 1450
 F 0 "#PWR0112" H 6400 1300 50  0001 C CNN
@@ -82,7 +48,7 @@ F 3 "" H 6400 1450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0113
+L power:GND #PWR0113
 U 1 1 5ADA7C93
 P 6000 1850
 F 0 "#PWR0113" H 6000 1600 50  0001 C CNN
@@ -93,7 +59,7 @@ F 3 "" H 6000 1850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0114
+L power:GND #PWR0114
 U 1 1 5ADA7C94
 P 5050 1750
 F 0 "#PWR0114" H 5050 1500 50  0001 C CNN
@@ -104,7 +70,7 @@ F 3 "" H 5050 1750 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C_Small C35
+L device:C_Small C35
 U 1 1 5ADA7C95
 P 5050 1600
 F 0 "C35" V 4850 1550 50  0000 L CNN
@@ -115,7 +81,7 @@ F 3 "" H 5050 1600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0115
+L power:GND #PWR0115
 U 1 1 5ADA7C96
 P 2050 1650
 F 0 "#PWR0115" H 2050 1400 50  0001 C CNN
@@ -126,7 +92,7 @@ F 3 "" H 2050 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C_Small C26
+L device:C_Small C26
 U 1 1 5ADA7C97
 P 2050 1500
 F 0 "C26" H 2060 1570 50  0000 L CNN
@@ -137,7 +103,7 @@ F 3 "" H 2050 1500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0116
+L power:GND #PWR0116
 U 1 1 5ADA7C98
 P 1700 1650
 F 0 "#PWR0116" H 1700 1400 50  0001 C CNN
@@ -148,7 +114,7 @@ F 3 "" H 1700 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C25
+L device:CP1_Small C25
 U 1 1 5ADA7C99
 P 1700 1500
 F 0 "C25" H 1710 1570 50  0000 L CNN
@@ -163,7 +129,7 @@ SCL
 Text GLabel 2650 2800 3    60   Input ~ 0
 SDA
 $Comp
-L GND #PWR0117
+L power:GND #PWR0117
 U 1 1 5ADA7C9A
 P 3000 2350
 F 0 "#PWR0117" H 3000 2100 50  0001 C CNN
@@ -174,7 +140,7 @@ F 3 "" H 3000 2350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R32
+L device:R R32
 U 1 1 5ADA7C9B
 P 2550 1350
 F 0 "R32" V 2630 1350 50  0000 C CNN
@@ -185,7 +151,7 @@ F 3 "" H 2550 1350 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L GND #PWR0118
+L power:GND #PWR0118
 U 1 1 5ADA7C9D
 P 1350 1650
 F 0 "#PWR0118" H 1350 1400 50  0001 C CNN
@@ -196,7 +162,7 @@ F 3 "" H 1350 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR0119
+L power:+12V #PWR0119
 U 1 1 5ADA7C9E
 P 3100 1300
 F 0 "#PWR0119" H 3100 1150 50  0001 C CNN
@@ -207,7 +173,7 @@ F 3 "" H 3100 1300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L INA219 U20
+L Peters:INA219 U20
 U 1 1 5ADA7C9F
 P 2300 2350
 F 0 "U20" V 2550 1650 60  0000 C CNN
@@ -218,7 +184,7 @@ F 3 "http://www.ti.com/lit/ds/symlink/ina219.pdf" H 2350 1500 60  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L C_Small C41
+L device:C_Small C41
 U 1 1 5ADA7CA0
 P 7850 4300
 F 0 "C41" H 7860 4370 50  0000 L CNN
@@ -229,7 +195,7 @@ F 3 "" H 7850 4300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR0120
+L power:+12V #PWR0120
 U 1 1 5ADA7CA1
 P 8100 3950
 F 0 "#PWR0120" H 8100 3800 50  0001 C CNN
@@ -240,7 +206,7 @@ F 3 "" H 8100 3950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0121
+L power:GND #PWR0121
 U 1 1 5ADA7CA2
 P 8300 4800
 F 0 "#PWR0121" H 8300 4550 50  0001 C CNN
@@ -251,7 +217,7 @@ F 3 "" H 8300 4800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0122
+L power:GND #PWR0122
 U 1 1 5ADA7CA3
 P 4800 2650
 F 0 "#PWR0122" H 4800 2400 50  0001 C CNN
@@ -262,7 +228,7 @@ F 3 "" H 4800 2650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C_Small C34
+L device:C_Small C34
 U 1 1 5ADA7CA4
 P 4800 2500
 F 0 "C34" H 4810 2570 50  0000 L CNN
@@ -273,7 +239,7 @@ F 3 "" H 4800 2500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR0123
+L power:+5V #PWR0123
 U 1 1 5ADA7CA5
 P 4800 2350
 F 0 "#PWR0123" H 4800 2200 50  0001 C CNN
@@ -284,7 +250,7 @@ F 3 "" H 4800 2350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L +3.3V #PWR0124
+L power:+3.3V #PWR0124
 U 1 1 5ADA7CA6
 P 6050 2350
 F 0 "#PWR0124" H 6050 2200 50  0001 C CNN
@@ -295,7 +261,7 @@ F 3 "" H 6050 2350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0125
+L power:GND #PWR0125
 U 1 1 5ADA7CA7
 P 6050 2700
 F 0 "#PWR0125" H 6050 2450 50  0001 C CNN
@@ -360,7 +326,7 @@ Wire Wire Line
 Wire Wire Line
 	6050 2650 6050 2700
 $Comp
-L GND #PWR0126
+L power:GND #PWR0126
 U 1 1 5ADA7CA9
 P 5400 2700
 F 0 "#PWR0126" H 5400 2450 50  0001 C CNN
@@ -371,7 +337,7 @@ F 3 "" H 5400 2700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L -5V #PWR130
+L power:-5V #PWR130
 U 1 1 5ADA7CAA
 P 3050 6200
 F 0 "#PWR130" H 3050 6300 50  0001 C CNN
@@ -382,7 +348,7 @@ F 3 "" H 3050 6200 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L LT1054 U19
+L Peters:LT1054 U19
 U 1 1 5ADA7CAB
 P 2100 6000
 F 0 "U19" H 2500 6550 60  0000 C CNN
@@ -393,7 +359,7 @@ F 3 "http://www.ti.com/lit/ds/symlink/lt1054.pdf" H 2450 5650 60  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1 C24
+L device:CP1 C24
 U 1 1 5ADA7CAC
 P 1000 5850
 F 0 "C24" H 1025 5950 50  0000 L CNN
@@ -404,7 +370,7 @@ F 3 "" H 1000 5850 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R33
+L device:R R33
 U 1 1 5ADA7CAD
 P 3000 5800
 F 0 "R33" V 3080 5800 50  0000 C CNN
@@ -415,7 +381,7 @@ F 3 "" H 3000 5800 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L R R34
+L device:R R34
 U 1 1 5ADA7CAE
 P 3000 5900
 F 0 "R34" V 3080 5900 50  0000 C CNN
@@ -426,7 +392,7 @@ F 3 "" H 3000 5900 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L +5V #PWR0127
+L power:+5V #PWR0127
 U 1 1 5ADA7CAF
 P 2100 5300
 F 0 "#PWR0127" H 2100 5150 50  0001 C CNN
@@ -437,7 +403,7 @@ F 3 "" H 2100 5300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Earth #PWR0128
+L power:Earth #PWR0128
 U 1 1 5ADA7CB0
 P 2100 6250
 F 0 "#PWR0128" H 2100 6000 50  0001 C CNN
@@ -472,7 +438,7 @@ Wire Wire Line
 	2700 5900 2700 6350
 Connection ~ 2700 5900
 $Comp
-L CP1 C29
+L device:CP1 C29
 U 1 1 5ADA7CB1
 P 2700 6500
 F 0 "C29" H 2725 6600 50  0000 L CNN
@@ -483,7 +449,7 @@ F 3 "" H 2700 6500 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Earth #PWR0129
+L power:Earth #PWR0129
 U 1 1 5ADA7CB2
 P 2700 6700
 F 0 "#PWR0129" H 2700 6450 50  0001 C CNN
@@ -499,7 +465,7 @@ Wire Wire Line
 	2700 6200 3200 6200
 Connection ~ 2700 6200
 $Comp
-L C C32
+L device:C C32
 U 1 1 5ADA7CB3
 P 3400 6150
 F 0 "C32" H 3425 6250 50  0000 L CNN
@@ -519,7 +485,7 @@ Wire Wire Line
 	3200 6300 3400 6300
 Connection ~ 3050 6200
 $Comp
-L C C30
+L device:C C30
 U 1 1 5ADA7CB4
 P 2750 5450
 F 0 "C30" H 2775 5550 50  0000 L CNN
@@ -534,7 +500,7 @@ Wire Wire Line
 Wire Wire Line
 	2750 5300 2100 5300
 $Comp
-L Earth #PWR0130
+L power:Earth #PWR0130
 U 1 1 5ADA7CB5
 P 2750 5600
 F 0 "#PWR0130" H 2750 5350 50  0001 C CNN
@@ -547,7 +513,7 @@ $EndComp
 Wire Wire Line
 	6000 1750 6000 1850
 $Comp
-L MAX6241 U24
+L Peters:MAX6241 U24
 U 1 1 5ADA7CB8
 P 8750 3800
 F 0 "U24" H 8650 3700 60  0000 C CNN
@@ -569,7 +535,7 @@ Wire Wire Line
 	7400 4050 8100 4050
 Connection ~ 8100 4050
 $Comp
-L C C42
+L device:C C42
 U 1 1 5ADA7CB9
 P 8100 4500
 F 0 "C42" H 8125 4600 50  0000 L CNN
@@ -594,7 +560,7 @@ Wire Wire Line
 Text GLabel 10500 4300 2    60   Input ~ 0
 4.096V
 $Comp
-L C C27
+L device:C C27
 U 1 1 5ADA7CBD
 P 2100 2550
 F 0 "C27" H 2125 2650 50  0000 L CNN
@@ -605,7 +571,7 @@ F 3 "" H 2100 2550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0131
+L power:GND #PWR0131
 U 1 1 5ADA7CBE
 P 2100 2800
 F 0 "#PWR0131" H 2100 2550 50  0001 C CNN
@@ -623,7 +589,7 @@ Text GLabel 2450 2800 3    60   Input ~ 0
 SDA
 Connection ~ 2100 2350
 $Comp
-L Barrel_Jack J15
+L conn:Barrel_Jack J15
 U 1 1 5ADA831E
 P 900 1450
 F 0 "J15" H 900 1660 50  0000 C CNN
@@ -634,7 +600,7 @@ F 3 "" H 950 1410 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0144
+L power:GND #PWR0144
 U 1 1 5ADA843B
 P 1200 1550
 F 0 "#PWR0144" H 1200 1300 50  0001 C CNN
@@ -660,7 +626,7 @@ Wire Wire Line
 Wire Wire Line
 	9250 4500 9150 4500
 $Comp
-L GND #PWR0145
+L power:GND #PWR0145
 U 1 1 5ADA8F5A
 P 9400 4700
 F 0 "#PWR0145" H 9400 4450 50  0001 C CNN
@@ -673,7 +639,7 @@ $EndComp
 Wire Wire Line
 	9400 4650 9400 4700
 $Comp
-L C_Small C40
+L device:C_Small C40
 U 1 1 5ADA9080
 P 7600 4300
 F 0 "C40" H 7610 4370 50  0000 L CNN
@@ -696,7 +662,7 @@ Wire Wire Line
 	7400 4750 7400 4400
 Connection ~ 7600 4750
 $Comp
-L CP1_Small C39
+L device:CP1_Small C39
 U 1 1 5ADA99FF
 P 7400 4300
 F 0 "C39" H 7410 4370 50  0000 L CNN
@@ -707,7 +673,7 @@ F 3 "" H 7400 4300 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L AD8628 U25
+L Peters:AD8628 U25
 U 1 1 5ADAAA51
 P 10100 4300
 F 0 "U25" H 10100 4500 50  0000 L CNN
@@ -718,7 +684,7 @@ F 3 "http://www.analog.com/media/en/technical-documentation/data-sheets/AD8628_8
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0146
+L power:GND #PWR0146
 U 1 1 5ADAAC56
 P 10050 4600
 F 0 "#PWR0146" H 10050 4350 50  0001 C CNN
@@ -740,7 +706,7 @@ Wire Wire Line
 	10400 4300 10500 4300
 Connection ~ 9400 4200
 $Comp
-L +5V #PWR0147
+L power:+5V #PWR0147
 U 1 1 5ADAAFA1
 P 10050 4000
 F 0 "#PWR0147" H 10050 3850 50  0001 C CNN
@@ -751,7 +717,7 @@ F 3 "" H 10050 4000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L LM1117-3.3 U21
+L regul:LM1117-3.3 U21
 U 1 1 5ADAB666
 P 5400 2400
 F 0 "U21" H 5250 2525 50  0000 C CNN
@@ -762,7 +728,7 @@ F 3 "" H 5400 2400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP1_Small C37
+L device:CP1_Small C37
 U 1 1 5ADABA11
 P 6050 2550
 F 0 "C37" H 6060 2620 50  0000 L CNN
@@ -774,7 +740,7 @@ F 3 "" H 6050 2550 50  0001 C CNN
 $EndComp
 Connection ~ 6050 2400
 $Comp
-L LM7805_TO220 U22
+L regul:LM7805_TO220 U22
 U 1 1 5ADABE82
 P 5550 1500
 F 0 "U22" H 5400 1625 50  0000 C CNN
@@ -785,7 +751,7 @@ F 3 "" H 5550 1450 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L C_Small C28
+L device:C_Small C28
 U 1 1 5ADABF9E
 P 2550 1200
 F 0 "C28" V 2350 1150 50  0000 L CNN
@@ -802,7 +768,7 @@ Wire Wire Line
 	2650 1200 2700 1200
 Connection ~ 2700 1350
 $Comp
-L C_Small C36
+L device:C_Small C36
 U 1 1 5ADAC218
 P 6000 1650
 F 0 "C36" V 5800 1600 50  0000 L CNN
@@ -813,7 +779,7 @@ F 3 "" H 6000 1650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L CP C33
+L device:CP C33
 U 1 1 5ADAC477
 P 4700 1600
 F 0 "C33" H 4725 1700 50  0000 L CNN
@@ -824,7 +790,7 @@ F 3 "" H 4700 1600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0148
+L power:GND #PWR0148
 U 1 1 5ADAC5F2
 P 4700 1750
 F 0 "#PWR0148" H 4700 1500 50  0001 C CNN
@@ -837,7 +803,7 @@ $EndComp
 Wire Wire Line
 	5050 1450 4700 1450
 $Comp
-L GND #PWR0149
+L power:GND #PWR0149
 U 1 1 5ADAC870
 P 5550 1800
 F 0 "#PWR0149" H 5550 1550 50  0001 C CNN
@@ -848,7 +814,7 @@ F 3 "" H 5550 1800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L L L2
+L device:L L2
 U 1 1 5ADAC8CD
 P 6250 1500
 F 0 "L2" V 6200 1500 50  0000 C CNN
@@ -859,7 +825,7 @@ F 3 "" H 6250 1500 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L C_Small C38
+L device:C_Small C38
 U 1 1 5ADAC999
 P 6400 1700
 F 0 "C38" V 6200 1650 50  0000 L CNN
@@ -870,7 +836,7 @@ F 3 "" H 6400 1700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0150
+L power:GND #PWR0150
 U 1 1 5ADACA3B
 P 6400 1850
 F 0 "#PWR0150" H 6400 1600 50  0001 C CNN
@@ -900,7 +866,7 @@ F 3 "" H 9400 4050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L L L1
+L device:L L1
 U 1 1 5ADB4139
 P 2950 1350
 F 0 "L1" V 2900 1350 50  0000 C CNN
@@ -911,7 +877,7 @@ F 3 "" H 2950 1350 50  0001 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L C_Small C31
+L device:C_Small C31
 U 1 1 5ADB413F
 P 3100 1550
 F 0 "C31" V 2900 1500 50  0000 L CNN
@@ -922,7 +888,7 @@ F 3 "" H 3100 1550 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR0151
+L power:GND #PWR0151
 U 1 1 5ADB4145
 P 3100 1700
 F 0 "#PWR0151" H 3100 1450 50  0001 C CNN
